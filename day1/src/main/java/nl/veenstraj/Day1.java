@@ -1,11 +1,10 @@
 package nl.veenstraj;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Application {
+public class Day1 {
     static int index = 99;
 
     public static void main(String[] args) {
