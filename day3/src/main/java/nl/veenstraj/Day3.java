@@ -17,7 +17,8 @@ public class Day3 {
     public static void main(String[] args) {
 
         leesInput();
-        part1();
+        //part1();
+        part2();
     }
 
     public static void leesInput() {
@@ -123,7 +124,10 @@ public class Day3 {
 
     private static boolean isDigit(int x, int y) {
         char a = getChar(x, y);
-        return a == '0' || a == '1' || a == '2' || a == '3' || a == '4' || a == '5' || a == '6' || a == '7' || a == '8' || a == '9';
+        for (int i = '0'; i <= '9'; i++) {
+            if (a == i) return true;
+        }
+        return false;
     }
 
     private static boolean isDot(int x, int y) {
@@ -154,9 +158,9 @@ public class Day3 {
             findSymbolAndAdd(x + i, y - 1, partNumber);
             findSymbolAndAdd(x + i, y + 1, partNumber);
         }
-        findSymbolAndAdd(x + i + 1, y - 1, partNumber);
-        findSymbolAndAdd(x + i + 1 - 1, y, partNumber);
-        findSymbolAndAdd(x + i + 1, y + 1, partNumber);
+        findSymbolAndAdd(x + i, y - 1, partNumber);
+        findSymbolAndAdd(x + i, y, partNumber);
+        findSymbolAndAdd(x + i, y + 1, partNumber);
     }
 
     private static void findSymbolAndAdd(int x, int y, String partNumber) {
