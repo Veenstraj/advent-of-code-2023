@@ -15,7 +15,6 @@ public class Day7 {
             put('A', 13);
             put('K', 12);
             put('Q', 11);
-            put('J', 10);
             put('T', 9);
             put('9', 8);
             put('8', 7);
@@ -25,6 +24,7 @@ public class Day7 {
             put('4', 3);
             put('3', 2);
             put('2', 1);
+            put('J', 0);
         }
     };
 
@@ -32,7 +32,7 @@ public class Day7 {
 
     public static void main(String[] args) {
         leesInput();
-        opgave1();
+        opgave2();
     }
 
     public static void leesInput() {
@@ -64,7 +64,7 @@ public class Day7 {
         }
     }
 
-    private static void opgave1() {
+    private static void opgave2() {
         List<Hand> hands = _hands.stream()
                 .sorted()
                 .toList();
@@ -98,30 +98,48 @@ public class Day7 {
         }
 
         private int determineType(char[] hand) {
-            // count the number of occurences of each card
-            HashMap<Character, Integer> occurences = new HashMap<>();
+            // count the number of occurrences of each card
+            HashMap<Character, Integer> occ = new HashMap<>();
             for (char a : hand) {
-                if (occurences.containsKey(a)) {
-                    occurences.put(a, occurences.get(a) + 1);
+                if (occ.containsKey(a)) {
+                    occ.put(a, occ.get(a) + 1);
                 } else {
-                    occurences.put(a, 1);
+                    occ.put(a, 1);
                 }
             }
             // five of a kind
-            if (occurences.containsValue(5)) return 7;
+            if (occ.containsValue(5)) return 7;
+            if (occ.containsValue(4) && occ.containsKey('J') && occ.get('J') == 1) return 7;
+            if (occ.containsValue(3) && occ.containsKey('J') && occ.get('J') == 2) return 7;
+            if (occ.containsValue(2) && occ.containsKey('J') && occ.get('J') == 3) return 7;
+            if (occ.containsValue(1) && occ.containsKey('J') && occ.get('J') == 4) return 7;
             // four of a kind
-            if (occurences.containsValue(4)) return 6;
+            if (occ.containsValue(4)) return 6;
+            if (occ.containsValue(3) && occ.containsKey('J') && occ.get('J') == 1) return 6;
+            if (occ.containsValue(2) && occ.containsKey('J') && occ.get('J') == 2 && aantalValues(occ, 2) == 2)
+                return 6;
+            if (occ.containsValue(1) && occ.containsKey('J') && occ.get('J') == 3) return 6;
             // Ful house
-            if (occurences.containsValue(3) && occurences.containsValue(2)) return 5;
+            if (occ.containsValue(3) && occ.containsValue(2)) return 5;
+            if (occ.containsValue(2) && occ.containsKey('J') && occ.get('J') == 1 && occ.keySet().size() == 3)
+                return 5;
             // Three of a kind
-            if (occurences.containsValue(3)) return 4;
+            if (occ.containsValue(3)) return 4;
+            if (occ.containsValue(2) && occ.containsKey('J') && occ.get('J') >= 1) return 4;
             // two pair
-            if (occurences.containsValue(2) && occurences.containsValue(1) && occurences.keySet().size() == 3) return 3;
+            if (occ.containsValue(2) && occ.containsValue(1) && aantalValues(occ, 2) == 2) return 3;
+            if (occ.containsValue(2) && occ.containsValue(1) && occ.containsKey('J')) return 3;
             // one pair
-            if (occurences.containsValue(2) && occurences.keySet().size() > 3) return 2;
+            if (occ.containsValue(2) && occ.keySet().size() > 3) return 2;
+            if (occ.containsKey('J')) return 2;
             // high card
-            if (occurences.keySet().size() == 5) return 1;
+            if (occ.keySet().size() == 5) return 1;
+            // de rest
             return 0;
+        }
+
+        private long aantalValues(HashMap<Character, Integer> map, int value) {
+            return map.values().stream().filter(v -> v == value).count();
         }
     }
 }
