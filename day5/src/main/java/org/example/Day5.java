@@ -3,20 +3,20 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
+import static java.lang.Long.MAX_VALUE;
+import static java.lang.Long.parseLong;
 
 public class Day5 {
     private static List<Long> _seeds = new ArrayList<>();
-    private static HashMap<Long, Long> _seedToSoil = new HashMap<>();
-    private static HashMap<Long, Long> _soilToFertilizer = new HashMap<>();
-    private static HashMap<Long, Long> _fertilizerToWater = new HashMap<>();
-    private static HashMap<Long, Long> _waterToLight = new HashMap<>();
-    private static HashMap<Long, Long> _lightToTemperature = new HashMap<>();
-    private static HashMap<Long, Long> _temperatureToHumidity = new HashMap<>();
-    private static HashMap<Long, Long> _humidityToLocation = new HashMap<>();
+    private static HashMap<Source, Long> _seedToSoil = new HashMap<>();
+    private static HashMap<Source, Long> _soilToFertilizer = new HashMap<>();
+    private static HashMap<Source, Long> _fertilizerToWater = new HashMap<>();
+    private static HashMap<Source, Long> _waterToLight = new HashMap<>();
+    private static HashMap<Source, Long> _lightToTemperature = new HashMap<>();
+    private static HashMap<Source, Long> _temperatureToHumidity = new HashMap<>();
+    private static HashMap<Source, Long> _humidityToLocation = new HashMap<>();
 
     public static void main(String[] args) {
 
@@ -40,7 +40,6 @@ public class Day5 {
             boolean humidityToLocation = false;
             while (line != null) {
                 boolean values = true;
-                System.out.println();
                 if (line.startsWith("seeds:")) {
                     String[] seedsArray = line.substring(6).trim().split(" ");
                     _seeds = Arrays.stream(seedsArray)
@@ -85,46 +84,73 @@ public class Day5 {
                 }
                 if (values && line.trim().length() > 0) {
                     String[] parts = line.split(" ");
-                    long destination = Long.parseLong(parts[0]);
-                    long source = Long.parseLong(parts[1]);
-                    long length = Long.parseLong(parts[2]);
-                    for (long i = 0; i < length; i++) {
-                        if (seedToSoil) _seedToSoil.put(source + i, destination + i);
-                        if (soilToFertilizer) _soilToFertilizer.put(source + i, destination + i);
-                        if (fertilizerToWater) _fertilizerToWater.put(source + i, destination + i);
-                        if (waterToLight) _waterToLight.put(source + i, destination + i);
-                        if (lightToTemperature) _lightToTemperature.put(source + i, destination + i);
-                        if (temperatureToHumidity) _temperatureToHumidity.put(source + i, destination + i);
-                        if (humidityToLocation) _humidityToLocation.put(source + i, destination + i);
-                    }
+                    long destination = parseLong(parts[0]);
+                    Source source = new Source(Long.parseLong(parts[1]), Long.parseLong(parts[2]));
+                    if (seedToSoil) _seedToSoil.put(source, destination);
+                    if (soilToFertilizer) _soilToFertilizer.put(source, destination);
+                    if (fertilizerToWater) _fertilizerToWater.put(source, destination);
+                    if (waterToLight) _waterToLight.put(source, destination);
+                    if (lightToTemperature) _lightToTemperature.put(source, destination);
+                    if (temperatureToHumidity) _temperatureToHumidity.put(source, destination);
+                    if (humidityToLocation) _humidityToLocation.put(source, destination);
                 }
 
                 // read next line
                 line = reader.readLine();
             }
+            long kleinste = MAX_VALUE;
+            boolean lengte = false;
+            long start = 0;
+            long length = 0;
             for (Long seed : _seeds) {
-                long soil = seed;
-                if (_seedToSoil.containsKey(seed)) soil = _seedToSoil.get(seed);
-                long fertilizer = soil;
-                if (_soilToFertilizer.containsKey(soil)) fertilizer = _soilToFertilizer.get(soil);
-                long water = fertilizer;
-                if (_fertilizerToWater.containsKey(fertilizer)) water = _fertilizerToWater.get(fertilizer);
-                long light = water;
-                if (_waterToLight.containsKey(water)) light = _waterToLight.get(water);
-                long temperature = light;
-                if (_lightToTemperature.containsKey(light)) temperature = _lightToTemperature.get(light);
-                long humidity = temperature;
-                if (_temperatureToHumidity.containsKey(temperature)) humidity = _temperatureToHumidity.get(temperature);
-                long location = humidity;
-                if (_humidityToLocation.containsKey(humidity)) location = _humidityToLocation.get(humidity);
-                System.out.println("Seed=" + seed + ", location=" + location);
+                if (!lengte) {
+                    start = seed;
+                    lengte = true;
+                } else {
+                    length = seed;
+                    System.out.println("start=" + start + ", length=" + length);
+                    for (long zaadje = start; zaadje < start + length; zaadje++) {
+
+                        long soil = readMap(zaadje, _seedToSoil);
+                        long fertilizer = readMap(soil, _soilToFertilizer);
+                        long water = readMap(fertilizer, _fertilizerToWater);
+                        long light = readMap(water, _waterToLight);
+                        long temperature = readMap(light, _lightToTemperature);
+                        long humidity = readMap(temperature, _temperatureToHumidity);
+                        long location = readMap(humidity, _humidityToLocation);
+                        if (kleinste > location) kleinste = location;
+                        //if (location % 10000 == 0) System.out.printf("\r" + zaadje);
+                        //System.out.println("Seed=" + seed + ", location=" + location);
+                    }
+                    lengte = false;
+                }
             }
-            System.out.println("sum=" + sum);
+            System.out.println("kleinste=" + kleinste);
 
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
 
+        }
+    }
+
+    private static long readMap(long input, Map<Source, Long> map) {
+        for (Source source : map.keySet()) {
+            if (input >= source.start && input < (source.start + source.length)) {
+                return map.get(source) + input - source.start;
+
+            }
+        }
+        return input;
+    }
+
+    static class Source {
+        public long start;
+        public long length;
+
+        public Source(long start, long length) {
+            this.start = start;
+            this.length = length;
         }
     }
 }
