@@ -16,26 +16,26 @@ public class Day6 {
     public static void opgave1() {
         BufferedReader reader;
         try {
-            reader = new BufferedReader(new FileReader("./day6/target/classes/input.txt"));
+            reader = new BufferedReader(new FileReader("./day6/target/classes/input2.txt"));
             String line = reader.readLine();
 
-            List<Integer> times = new ArrayList<>();
-            List<Integer> distances = new ArrayList<>();
+            List<Long> times = new ArrayList<>();
+            List<Long> distances = new ArrayList<>();
 
-            int sum = 1;
+            long sum = 1;
             while (line != null) {
 
                 if (line.trim().startsWith("Time:")) {
                     times = Arrays.stream(line.substring(10).split(" "))
                             .filter(t -> !t.trim().isEmpty())
-                            .map(t -> Integer.parseInt(t.trim()))
+                            .map(t -> Long.parseLong(t.trim()))
                             .toList();
                 }
 
                 if (line.trim().startsWith("Distance:")) {
                     distances = Arrays.stream(line.substring(10).split(" "))
                             .filter(t -> !t.trim().isEmpty())
-                            .map(t -> Integer.parseInt(t.trim()))
+                            .map(t -> Long.parseLong(t.trim()))
                             .toList();
                 }
 
@@ -43,14 +43,14 @@ public class Day6 {
                 line = reader.readLine();
             }
             for (int race = 0; race < times.size(); race++) {
-                int wins = 0;
-                for (int timeButtonPress = 1; timeButtonPress < times.get(race); timeButtonPress++) {
-                    int timeMove = times.get(race) - timeButtonPress;
-                    int speed = timeButtonPress;
-                    int distance = timeMove * speed;
-                    System.out.println("time button press:" + timeButtonPress + ", time move:" + timeMove + ", speed:" + speed + ", distance: " + distance);
+                long wins = 0;
+                for (long timeButtonPress = 1; timeButtonPress < times.get(race); timeButtonPress++) {
+                    long timeMove = times.get(race) - timeButtonPress;
+                    long speed = timeButtonPress;
+                    long distance = timeMove * speed;
+                    //System.out.println("time button press:" + timeButtonPress + ", time move:" + timeMove + ", speed:" + speed + ", distance: " + distance);
                     if (distance > distances.get(race)) {
-                        System.out.println("Won the race: " + distance + " : " + distances.get(race));
+                        //System.out.println("Won the race: " + distance + " / " + distances.get(race));
                         wins++;
                     }
 
