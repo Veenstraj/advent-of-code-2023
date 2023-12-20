@@ -50,20 +50,28 @@ public class Day8_alt {
 
             // opgave2
             int directionpos = 0;
+            long lcm = 0;
             boolean endReached;
-            long steps = 0;
             int[] inNodes = Arrays.stream(keys).filter(k -> ((k) % 100) == 'A').toArray();
-            do {
-                endReached = true;
-                for (int nodeIndex = 0; nodeIndex < inNodes.length; nodeIndex++) {
+            for (int nodeIndex = 0; nodeIndex < inNodes.length; nodeIndex++) {
+                long steps = 0;
+                do {
+                    endReached = true;
                     inNodes[nodeIndex] = directions[directionpos] == 'R' ? rvalues[inNodes[nodeIndex]] : lvalues[inNodes[nodeIndex]];
                     if ((inNodes[nodeIndex] % 100) != 'Z') endReached = false;
-                }
-                if (++directionpos >= directions.length) directionpos = 0;
-                if ((++steps % 4194304) == 0) System.out.printf("\r" + steps);
 
-            } while (!endReached);
-            System.out.println("steps:" + steps);
+                    if (++directionpos >= directions.length) directionpos = 0;
+                    if ((++steps % 4194304) == 0) System.out.printf("\r" + steps);
+
+                } while (!endReached);
+                System.out.println("steps:" + steps);
+                if (lcm > 0) {
+                    lcm = findLCM(new long[]{steps, lcm});
+                } else {
+                    lcm = steps;
+                }
+            }
+            System.out.println("lcm = " + lcm);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,13 +79,22 @@ public class Day8_alt {
         }
     }
 
-    private static String getNode(String value, char direction) {
-        String result;
-        if (direction == 'L') {
-            result = value.trim().substring(1, 4);
-        } else {
-            result = value.trim().substring(6, 9);
+    private static long findLCM(long[] arr) {
+        long lcm = arr[0];
+        for (int i = 0; i < arr.length; i++) {
+            long currentNumber = arr[i];
+            lcm = (lcm * currentNumber) / gcd(lcm, currentNumber);
         }
-        return result;
+        return lcm;
+    }
+
+    private static long gcd(long a, long b) {
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
+
+        }
+        return a;
     }
 }
