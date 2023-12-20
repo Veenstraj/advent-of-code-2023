@@ -3,14 +3,12 @@ package nl.veenstraj;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Arrays;
 
-public class Day8 {
+public class Day8_alt {
     public static void main(String[] args) {
 
-        opgave1(); // en 2
+        opgave1();
     }
 
     public static void opgave1() {
@@ -19,9 +17,13 @@ public class Day8 {
         try {
             reader = new BufferedReader(new FileReader("./day8/target/classes/input.txt"));
             String line = reader.readLine();
-            HashMap<String, String> nodes = new HashMap<>();
+
             char[] directions = new char[0];
             boolean leesDirections = true;
+            int[] rvalues = new int[999999];
+            int[] lvalues = new int[999999];
+            int[] keys = new int[1000];
+            int keyIndex = 0;
             while (line != null) {
                 if (!line.trim().isEmpty()) {
                     if (leesDirections) {
@@ -30,7 +32,15 @@ public class Day8 {
                         leesDirections = false;
                     } else {
                         String[] keyvalues = line.split("=");
-                        nodes.put(keyvalues[0].trim(), keyvalues[1].trim());
+                        char[] keyChar = keyvalues[0].trim().toCharArray();
+                        int key = keyChar[0] * 100 * 100 + keyChar[1] * 100 + keyChar[2];
+                        keys[keyIndex++] = key;
+                        char[] valueLChar = keyvalues[1].trim().substring(1, 4).toCharArray();
+                        char[] valueRChar = keyvalues[1].trim().substring(6, 9).toCharArray();
+                        lvalues[key] = valueLChar[0] * 100 * 100 + valueLChar[1] * 100 + valueLChar[2];
+                        rvalues[key] = valueRChar[0] * 100 * 100 + valueRChar[1] * 100 + valueRChar[2];
+
+                        //System.out.println("Code=" + keyvalues[0] + " = " + key);
                     }
                 }
                 // read next line
@@ -38,31 +48,21 @@ public class Day8 {
             }
             reader.close();
 
-            // opgave1
-            int directionpos = 0;
-            long steps = 0;
-//            String node = "AAA";
-//            do {
-//                node = getNode(nodes, node, directions[directionpos++]);
-//                steps++;
-//                if (directionpos >= directions.length) directionpos = 0;
-//                System.out.println("node=" + node + ", step:" + steps);
-//            } while (!node.equals("ZZZ"));
-
             // opgave2
-            directionpos = 0;
-            steps = 0;
-            List<String> inNodes = nodes.keySet().stream().filter(k -> k.endsWith("A")).toList();
-            List<String> nextNodes;
+            int directionpos = 0;
+            boolean endReached;
+            long steps = 0;
+            int[] inNodes = Arrays.stream(keys).filter(k -> ((k) % 100) == 'A').toArray();
             do {
-                nextNodes = new ArrayList<>();
-                for (String inNode : inNodes) {
-                    nextNodes.add(getNode(nodes.get(inNode), directions[directionpos]));
+                endReached = true;
+                for (int nodeIndex = 0; nodeIndex < inNodes.length; nodeIndex++) {
+                    inNodes[nodeIndex] = directions[directionpos] == 'R' ? rvalues[inNodes[nodeIndex]] : lvalues[inNodes[nodeIndex]];
+                    if ((inNodes[nodeIndex] % 100) != 'Z') endReached = false;
                 }
-                inNodes = nextNodes;
                 if (++directionpos >= directions.length) directionpos = 0;
-                if ((++steps % 4000000) == 0) System.out.printf("\r" + steps);
-            } while (!nextNodes.stream().allMatch(n -> n.endsWith("Z")));
+                if ((++steps % 4194304) == 0) System.out.printf("\r" + steps);
+
+            } while (!endReached);
             System.out.println("steps:" + steps);
 
         } catch (IOException e) {
