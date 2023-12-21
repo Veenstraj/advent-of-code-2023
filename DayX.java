@@ -1,10 +1,9 @@
-package
+//package
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-;
 
 public class DayX {
     public static void main(String[] args) {
@@ -21,13 +20,18 @@ public class DayX {
 
             int sum = 0;
             while (line != null) {
+                if (line.trim().length() > 0) {
+
+                }
 
                 // read next line
                 line = reader.readLine();
             }
+            reader.close();
+
+
             System.out.println("sum=" + sum);
 
-            reader.close();
         } catch (IOException e) {
             e.printStackTrace();
 
