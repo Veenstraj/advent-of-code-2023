@@ -15,10 +15,11 @@ public class Day9 {
         BufferedReader reader;
 
         try {
-            reader = new BufferedReader(new FileReader("./day9/target/classes/inputTest.txt"));
+            reader = new BufferedReader(new FileReader("./day9/target/classes/input.txt"));
             String line = reader.readLine();
 
             int sum = 0;
+            int sump = 0;
             while (line != null) {
                 if (line.trim().length() > 0) {
                     String[] parts = line.split(" ");
@@ -28,11 +29,17 @@ public class Day9 {
                     int nextNumber = predictNumber(result);
                     sum += nextNumber;
                     System.out.println("Next=" + nextNumber + ", sum=" + sum);
+
+                    // opgave 2
+
+                    int prevNumber = predictPrevNumber(result);
+                    sump += prevNumber;
+                    System.out.println("Prev=" + prevNumber + ", sum=" + sump);
                 }
                 // read next line
                 line = reader.readLine();
             }
-            System.out.println("sum=" + sum);
+            System.out.println("sum next=" + sum + ", sum prev=" + sump);
 
             reader.close();
         } catch (IOException e) {
@@ -58,4 +65,23 @@ public class Day9 {
         return input[input.length - 1] + predictNumber(differences);
 
     }
+
+    private static int predictPrevNumber(int[] input) {
+        int[] differences = new int[input.length - 1];
+        boolean allZeros = true;
+        for (int i = 0; i < input.length - 1; i++) {
+            System.out.printf(input[i] + " ");
+            differences[i] = input[i + 1] - input[i];
+            if (differences[i] != 0) allZeros = false;
+        }
+        if (allZeros) {
+            System.out.println("nieuw:" + (input[0]));
+            return (input[0]);
+        }
+
+        System.out.println();
+        return input[0] - predictPrevNumber(differences);
+
+    }
+
 }
