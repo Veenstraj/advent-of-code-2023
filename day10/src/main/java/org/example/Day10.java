@@ -19,7 +19,7 @@ public class Day10 {
         BufferedReader reader;
 
         try {
-            reader = new BufferedReader(new FileReader("./day10/target/classes/input.txt"));
+            reader = new BufferedReader(new FileReader("./day10/target/classes/inputTest.txt"));
             String line = reader.readLine();
 
             int index = 0;
@@ -47,9 +47,9 @@ public class Day10 {
 
             System.out.println("Starting at (" + (y + 1) + "," + (x + 1) + ")");
             int distance = 0;
-            int maxDistance = calcDistance(x, y, x, y, distance, 'x');
+            int maxDistance = calcDistance(x, y, x, y, distance, ' ');
 
-            System.out.println("maxDistance=" + maxDistance);
+            System.out.println("maxDistance=" + _maxDistance);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,7 +58,7 @@ public class Day10 {
     }
 
     private static int calcDistance(int x, int y, int prevx, int prevy, int distance, char richting) {
-        //System.out.println(("(" + (y + 1) + "," + (x + 1) + ") " + _map[y][x] + " " + richting + " : " + distance));
+        System.out.println(("(" + (y + 1) + "," + (x + 1) + ") " + richting + " " + _map[y][x] + " : " + distance));
         char a = _map[y][x];
         boolean culdesac = true;
         if (a != '|' && a != 'L' && a != 'F' && x - 1 >= 0 && (x - 1 != prevx)) { // going west
@@ -114,7 +114,11 @@ public class Day10 {
             }
         }
         if (culdesac) {
-            bepaalMax(distance);
+            if (distance > _maxDistance) {
+                _maxDistance = distance;
+                System.out.println("cds: maxDistance=" + _maxDistance);
+            }
+            distance = 0;
             System.out.printf("<");
         }
         return distance;
