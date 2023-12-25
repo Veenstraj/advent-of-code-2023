@@ -46,11 +46,9 @@ public class Day10 {
                 }
             }
             System.out.println("Starting at (" + (y + 1) + "," + (x + 1) + ")");
-            int distance = 0;
-            calcDistance(x, y, x, y, distance, ' ');
+            calcDistance(x, y, x, y, 0, ' ');
             System.out.println("maxDistance=" + _maxDistance);
-
-            System.out.println("AantalInnerTiles= " + determineInnerTiles());
+            determineInnerTiles();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,90 +56,145 @@ public class Day10 {
         }
     }
 
-    private static int calcDistance(int x, int y, int prevx, int prevy, int distance, char richting) {
-        // System.out.println(("(" + (y + 1) + "," + (x + 1) + ") " + richting + " " + _map[y][x] + " : " + distance));
+    private static int calcDistance(int x, int y, int prevx, int prevy, int distance, char direction) {
+        //System.out.println(("(" + (y + 1) + "," + (x + 1) + ") " + direction + " " + _map[y][x] + " : " + distance));
         char a = _map[y][x];
-        _visited[y][x] = a == 'S' ? 'S' : (char) (distance % 10 + '0');
-        if (a != '|' && a != 'L' && a != 'F' && (x - 1 != prevx)) { // going west
+        _visited[y][x] = a; // == 'S' ? 'S' : (char) (distance % 10 + '0');
+        if (a != '|' && a != 'L' && a != 'F' && (x - 1 != prevx) && (x - 1 >= 0)) { // going west
             switch (_map[y][x - 1]) {
-                case '-', 'L', 'F' -> distance = calcDistance(x - 1, y, x, y, distance + 1, 'w');
+                case '-' -> {
+                    set(x - 1, y - 1, 'I');
+                    set(x - 1, y + 1, 'O');
+                    distance = calcDistance(x - 1, y, x, y, distance + 1, 'w');
+                }
+                case 'L' -> {
+                    set(x - 2, y, 'O');
+                    set(x - 1, y + 1, 'O');
+                    distance = calcDistance(x - 1, y, x, y, distance + 1, 'w');
+                }
+                case 'F' -> {
+                    set(x - 1, y - 1, 'I');
+                    set(x - 2, y, 'I');
+                    distance = calcDistance(x - 1, y, x, y, distance + 1, 'w');
+                }
                 case 'S' -> distance = bepaalMax(distance);
             }
         }
-        if (a != '|' && a != 'J' && a != '7' && (x + 1 != prevx)) { // going east
+        if (a != '|' && a != 'J' && a != '7' && (x + 1 != prevx) && (x + 1 < _map[y].length)) { // going east
             switch (_map[y][x + 1]) {
-                case '-', 'J', '7' -> distance = calcDistance(x + 1, y, x, y, distance + 1, 'e');
+                case '-' -> {
+                    set(x + 1, y - 1, 'O');
+                    set(x + 1, y + 1, 'I');
+                    distance = calcDistance(x + 1, y, x, y, distance + 1, 'e');
+                }
+                case 'J' -> {
+                    set(x + 1, y + 1, 'I');
+                    set(x + 2, y, 'I');
+                    distance = calcDistance(x + 1, y, x, y, distance + 1, 'e');
+                }
+                case '7' -> {
+                    set(x + 1, y - 1, 'O');
+                    set(x + 2, y, 'O');
+                    distance = calcDistance(x + 1, y, x, y, distance + 1, 'e');
+                }
                 case 'S' -> distance = bepaalMax(distance);
             }
         }
-        if (a != '-' && a != '7' && a != 'F' && (y - 1 != prevy)) { // going north
+        if (a != '-' && a != '7' && a != 'F' && (y - 1 != prevy) && (y - 1 >= 0)) { // going north
             switch (_map[y - 1][x]) {
-                case '|', 'F', '7' -> distance = calcDistance(x, y - 1, x, y, distance + 1, 'n');
+                case '|' -> {
+                    set(x - 1, y - 1, 'O');
+                    set(x + 1, y - 1, 'I');
+                    distance = calcDistance(x, y - 1, x, y, distance + 1, 'n');
+                }
+                case 'F' -> {
+                    set(x - 1, y - 1, 'O');
+                    set(x, y - 2, 'O');
+                    distance = calcDistance(x, y - 1, x, y, distance + 1, 'n');
+                }
+                case '7' -> {
+                    set(x + 1, y - 1, 'I');
+                    set(x, y - 2, 'I');
+                    distance = calcDistance(x, y - 1, x, y, distance + 1, 'n');
+                }
                 case 'S' -> distance = bepaalMax(distance);
             }
         }
-        if (a != '-' && a != 'L' && a != 'J' && (y + 1 != prevy)) { // going south
+        if (a != '-' && a != 'L' && a != 'J' && (y + 1 != prevy) && (y + 1 < _map.length)) { // going south
             switch (_map[y + 1][x]) {
-                case '|', 'J', 'L' -> distance = calcDistance(x, y + 1, x, y, distance + 1, 's');
+                case '|' -> {
+                    set(x - 1, y + 1, 'I');
+                    set(x + 1, y + 1, 'O');
+                    distance = calcDistance(x, y + 1, x, y, distance + 1, 's');
+                }
+                case 'J' -> {
+                    set(x, y + 2, 'O');
+                    set(x + 1, y + 1, 'O');
+                    distance = calcDistance(x, y + 1, x, y, distance + 1, 's');
+                }
+                case 'L' -> {
+                    set(x, y + 2, 'I');
+                    set(x - 1, y + 1, 'I');
+                    distance = calcDistance(x, y + 1, x, y, distance + 1, 's');
+                }
                 case 'S' -> distance = bepaalMax(distance);
             }
         }
         return distance;
     }
 
+    private static void set(int x, int y, char value) {
+        if (!isBorder(x, y) && (_visited[y][x] == 0 || _visited[y][x] == 'I' || _visited[y][x] == 'O'))
+            _visited[y][x] = value;
+    }
 
-    private static int determineInnerTiles() {
+    private static void determineInnerTiles() {
         int nrOfInnerTiles = 0;
+        int nrOfOuterTiles = 0;
         System.out.println();
         for (int y = 0; y < _visited.length; y++) {
             for (int x = 0; x < _visited[y].length; x++) {
                 _visited[y][x] = getTileType(x, y, x, y);
                 if (_visited[y][x] == 'I') nrOfInnerTiles++;
+                if (_visited[y][x] == 'O') nrOfOuterTiles++;
                 System.out.printf(String.valueOf(_visited[y][x]));
             }
             System.out.println();
         }
-        return nrOfInnerTiles;
+        System.out.println();
+        System.out.println("Inner tiles: " + nrOfInnerTiles);
+        System.out.println("Outer tiles: " + nrOfOuterTiles);
     }
 
     private static char getTileType(int x, int y, int prevx, int prevy) {
-        //System.out.printf(" get (" + (y+1) + "," + (x+1)+ "):");
-        if (_visited[y][x] == 0) {
-            // aan de rand is geen inner tile
-            if (x == 0 || x >= _visited[y].length - 1 || y == 0 || y >= _visited.length - 1) {
-                return 'O';
-            }
+        //System.out.printf(" (" + (y+1) + "," + (x+1)+ "):");
+        char v = _visited[y][x];
+        if (v == 0) {
+            // at the border there is no inner tile
+            if (isBorder(x, y)) return 'O';
             if (x - 1 != prevx) {
                 char a = getTileType(x - 1, y, x, y);
-                if (a == 'O' || a == 'I') {
-                    _visited[y][x] = a;
-                    return a;
-                }
+                if (a == 'O' || a == 'I') return a;
             }
             if (x + 1 != prevx) {
                 char a = getTileType(x + 1, y, x, y);
-                if (a == 'O' || a == 'I') {
-                    _visited[y][x] = a;
-                    return a;
-                }
+                if (a == 'O' || a == 'I') return a;
             }
             if (y - 1 != prevy) {
                 char a = getTileType(x, y - 1, x, y);
-                if (a == 'O' || a == 'I') {
-                    _visited[y][x] = a;
-                    return a;
-                }
+                if (a == 'O' || a == 'I') return a;
             }
             if (y + 1 != prevy) {
                 char a = getTileType(x, y + 1, x, y);
-                if (a == 'O' || a == 'I') {
-                    _visited[y][x] = a;
-                    return a;
-                }
+                if (a == 'O' || a == 'I') return a;
             }
             return 'I';
         }
         return _visited[y][x];
+    }
+
+    private static boolean isBorder(int x, int y) {
+        return x <= 0 || y <= 0 || y >= _visited.length - 1 || x >= _visited[y].length - 1;
     }
 
     private static int bepaalMax(int distance) {
