@@ -6,6 +6,8 @@ import java.io.IOException;
 
 
 public class DayX {
+    private static final String inputfile = "./dayx/target/classes/input.txt";
+
     public static void main(String[] args) {
 
         opgave1();
@@ -15,7 +17,7 @@ public class DayX {
         BufferedReader reader;
 
         try {
-            reader = new BufferedReader(new FileReader("./day9/target/classes/input.txt"));
+            reader = new BufferedReader(new FileReader(inputfile));
             String line = reader.readLine();
 
             int sum = 0;
