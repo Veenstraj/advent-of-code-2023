@@ -11,6 +11,10 @@ public class Day16 {
     private static int _sizey;
     private static char[][] _visited;
 
+    private static int _maxEnergized = 0;
+    private static int _maxEnergizedX = -1;
+    private static int _maxEnergizedY = -1;
+
     public static void main(String[] args) {
 
         opgave1();
@@ -37,15 +41,50 @@ public class Day16 {
             _sizex = _map[0].length;
             _visited = new char[_sizey][_sizex];
 
-            // starting point is (0,0) going east
             findTheWay(0, 0, 'e', 0);
+            setMax(0, 0);
+            for (int x = 0; x < _sizex; x++) {
+                resetMap();
+                resetVst();
+                findTheWay(x, 0, 's', 0);
+                setMax(x, 0);
+            }
+            for (int x = 0; x < _sizex; x++) {
+                resetMap();
+                resetVst();
+                findTheWay(x, _sizey - 1, 'n', 0);
+                setMax(x, _sizey - 1);
+            }
+            for (int y = 0; y < _sizey; y++) {
+                resetMap();
+                resetVst();
+                findTheWay(0, y, 'e', 0);
+                setMax(0, y);
+            }
+            for (int y = 0; y < _sizey; y++) {
+                resetMap();
+                resetVst();
+                findTheWay(_sizex - 1, y, 'w', 0);
+                setMax(_sizex - 1, y);
+            }
 //            printMap("Paths");
 //            printContraption("Energization");
-            printEnergized();
+            //System.out.println("Energized: " + ());
 
         } catch (IOException e) {
             e.printStackTrace();
 
+        }
+    }
+
+    private static void setMax(int x, int y) {
+        int energized = getEnergized();
+        if (energized > _maxEnergized) {
+            printCoord(x, y);
+            System.out.println(" energized=" + energized);
+            _maxEnergized = energized;
+            _maxEnergizedX = x;
+            _maxEnergizedY = y;
         }
     }
 
@@ -57,7 +96,7 @@ public class Day16 {
             return;
         }
 //        System.out.printf("%c ", getMap(x, y));
-        if (checkSameWay(x, y, direction, depth)) {
+        if (checkSameWay(x, y, direction)) {
 //            System.out.println("Same way...");
             return;
         }
@@ -115,12 +154,9 @@ public class Day16 {
     }
 
     // check if the beam goes the same way as a previous one
-    private static boolean checkSameWay(int x, int y, char direction, int depth) {
+    private static boolean checkSameWay(int x, int y, char direction) {
         if (isOutside(x, y)) return false;
 
-//        if ((depth > _maxDepth / 2) && getVst(x, y) == '#') {
-//            return true;
-//        }
         switch (getMap(x, y)) {
             case '.' -> {
                 switch (direction) {
@@ -131,24 +167,16 @@ public class Day16 {
                 }
             }
             case '<' -> {
-                if (direction == 'w') {
-                    return true;
-                }
+                return direction == 'w';
             }
             case '>' -> {
-                if (direction == 'e') {
-                    return true;
-                }
+                return direction == 'e';
             }
             case '^' -> {
-                if (direction == 'n') {
-                    return true;
-                }
+                return (direction == 'n');
             }
             case 'v' -> {
-                if (direction == 's') {
-                    return true;
-                }
+                return (direction == 's');
             }
         }
         return false;
@@ -186,14 +214,14 @@ public class Day16 {
         System.out.print("(" + (y + 1) + "," + (x + 1) + ")");
     }
 
-    private static void printEnergized() {
+    private static int getEnergized() {
         int energized = 0;
         for (int y = 0; y < _sizey; y++) {
             for (int x = 0; x < _sizex; x++) {
                 if (getVst(x, y) != 0) energized++;
             }
         }
-        System.out.println("Energized: " + energized);
+        return energized;
     }
 
     private static void printContraption(String caption) {
@@ -218,4 +246,21 @@ public class Day16 {
         System.out.println();
     }
 
+    private static void resetMap() {
+        for (int y = 0; y < _sizey; y++) {
+            for (int x = 0; x < _sizex; x++) {
+                char a = getMap(x, y);
+                if (a == 'v' || a == '^' || a == '<' || a == '>') setMap(x, y, '.');
+            }
+        }
+    }
+
+    private static void resetVst() {
+        for (int y = 0; y < _sizey; y++) {
+            for (int x = 0; x < _sizex; x++) {
+                char a = getVst(x, y);
+                if (a == 'w' || a == 'e' || a == 'n' || a == 's') setVst(x, y, (char) 0);
+            }
+        }
+    }
 }
