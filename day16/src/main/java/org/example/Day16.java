@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Day16 {
-    private static final int _maxDepth = 900;
+    private static final int _maxDepth = 5000;
     private static final char[][] _map = new char[140][140];
     private static int _sizex;
     private static int _sizey;
@@ -39,7 +39,8 @@ public class Day16 {
 
             // starting point is (0,0) going east
             findTheWay(0, 0, 'e', 0);
-            printContraption("Energization");
+//            printMap("Paths");
+//            printContraption("Energization");
             printEnergized();
 
         } catch (IOException e) {
@@ -49,12 +50,24 @@ public class Day16 {
     }
 
     private static void findTheWay(int x, int y, char direction, int depth) {
-        if (isOutside(x, y)) return;
-        if (++depth > _maxDepth) return;
 //        printCoord(x, y);
-        set(x, y, '#');
-        switch (get(x, y)) {
-            case '.' -> {
+//        System.out.printf("%c", direction);
+        if (isOutside(x, y)) {
+//            System.out.println("outside");
+            return;
+        }
+//        System.out.printf("%c ", getMap(x, y));
+        if (checkSameWay(x, y, direction, depth)) {
+//            System.out.println("Same way...");
+            return;
+        }
+        if (depth++ > _maxDepth) {
+            System.out.println("Max depth reached.");
+            return;
+        }
+        setVst(x, y, direction);
+        switch (getMap(x, y)) {
+            case '.', 'v', '^', '<', '>' -> {
                 switch (direction) {
                     case 'w' -> findTheWay(x - 1, y, direction, depth);
                     case 'e' -> findTheWay(x + 1, y, direction, depth);
@@ -81,8 +94,8 @@ public class Day16 {
             case '|' -> {
                 switch (direction) {
                     case 'w', 'e' -> {
-                        findTheWay(x, y - 1, 'n', depth);
-                        findTheWay(x, y + 1, 's', depth);
+                        if (!isOutside(x, y - 1) && getVst(x, y - 1) != 'n') findTheWay(x, y - 1, 'n', depth);
+                        if (!isOutside(x, y + 1) && getVst(x, y + 1) != 's') findTheWay(x, y + 1, 's', depth);
                     }
                     case 'n' -> findTheWay(x, y - 1, direction, depth);
                     case 's' -> findTheWay(x, y + 1, direction, depth);
@@ -93,16 +106,60 @@ public class Day16 {
                     case 'w' -> findTheWay(x - 1, y, direction, depth);
                     case 'e' -> findTheWay(x + 1, y, direction, depth);
                     case 'n', 's' -> {
-                        findTheWay(x - 1, y, 'w', depth);
-                        findTheWay(x + 1, y, 'e', depth);
+                        if (!isOutside(x - 1, y) && getVst(x - 1, y) != 'w') findTheWay(x - 1, y, 'w', depth);
+                        if (!isOutside(x + 1, y) && getVst(x + 1, y) != 'e') findTheWay(x + 1, y, 'e', depth);
                     }
                 }
             }
         }
     }
 
-    private static void set(int x, int y, char value) {
+    // check if the beam goes the same way as a previous one
+    private static boolean checkSameWay(int x, int y, char direction, int depth) {
+        if (isOutside(x, y)) return false;
+
+//        if ((depth > _maxDepth / 2) && getVst(x, y) == '#') {
+//            return true;
+//        }
+        switch (getMap(x, y)) {
+            case '.' -> {
+                switch (direction) {
+                    case 'w' -> setMap(x, y, '<');
+                    case 'e' -> setMap(x, y, '>');
+                    case 's' -> setMap(x, y, 'v');
+                    case 'n' -> setMap(x, y, '^');
+                }
+            }
+            case '<' -> {
+                if (direction == 'w') {
+                    return true;
+                }
+            }
+            case '>' -> {
+                if (direction == 'e') {
+                    return true;
+                }
+            }
+            case '^' -> {
+                if (direction == 'n') {
+                    return true;
+                }
+            }
+            case 'v' -> {
+                if (direction == 's') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static void setVst(int x, int y, char value) {
         if (!isOutside(x, y)) _visited[y][x] = value;
+    }
+
+    private static char getVst(int x, int y) {
+        return _visited[y][x];
     }
 
 
@@ -110,27 +167,30 @@ public class Day16 {
         return x < 0 || y < 0 || y >= _sizey || x >= _sizex;
     }
 
-    private static char get(int x, int y) {
+    private static char getMap(int x, int y) {
         return _map[y][x];
     }
 
-//        private static void set ( int x, int y, char a){
-//            _map[y][x] = a;
-//        }
+    private static void setMap(int x, int y, char value) {
+        if (!isOutside(x, y)) {
+//            System.out.printf("Write %c%n", value);
+            _map[y][x] = value;
+        }
+    }
 
     private static void print(int x, int y) {
-        System.out.print(String.valueOf(get(x, y)) + " ");
+        System.out.print(String.valueOf(getMap(x, y)) + " ");
     }
 
     private static void printCoord(int x, int y) {
-        System.out.print("(" + (y + 1) + "," + (x + 1) + ") ");
+        System.out.print("(" + (y + 1) + "," + (x + 1) + ")");
     }
 
     private static void printEnergized() {
         int energized = 0;
         for (int y = 0; y < _sizey; y++) {
             for (int x = 0; x < _sizex; x++) {
-                if (_visited[y][x] == '#') energized++;
+                if (getVst(x, y) != 0) energized++;
             }
         }
         System.out.println("Energized: " + energized);
@@ -140,7 +200,18 @@ public class Day16 {
         System.out.println(caption);
         for (int y = 0; y < _sizey; y++) {
             for (int x = 0; x < _sizex; x++) {
-                System.out.print(String.valueOf(_visited[y][x]) + " ");
+                System.out.print(String.valueOf(getVst(x, y)));
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    private static void printMap(String caption) {
+        System.out.println(caption);
+        for (int y = 0; y < _sizey; y++) {
+            for (int x = 0; x < _sizex; x++) {
+                System.out.print(String.valueOf(getMap(x, y)));
             }
             System.out.println();
         }
