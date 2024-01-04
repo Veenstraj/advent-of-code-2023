@@ -12,8 +12,6 @@ public class Day16 {
     private static char[][] _visited;
 
     private static int _maxEnergized = 0;
-    private static int _maxEnergizedX = -1;
-    private static int _maxEnergizedY = -1;
 
     public static void main(String[] args) {
 
@@ -83,8 +81,6 @@ public class Day16 {
             printCoord(x, y);
             System.out.println(" energized=" + energized);
             _maxEnergized = energized;
-            _maxEnergizedX = x;
-            _maxEnergizedY = y;
         }
     }
 

@@ -40,7 +40,7 @@ public class Day12 {
                     int sequence = 0;
                     do {
                         arrayRecordTocheck = getConditionrecord(arrayRecordTocheck, 0);
-                        System.out.print("\rCheck " + String.valueOf(arrayRecordTocheck));//.replaceAll("d",".").replaceAll("h", "#"));
+                        //System.out.print("\rCheck " + String.valueOf(arrayRecordTocheck));//.replaceAll("d",".").replaceAll("h", "#"));
                         //System.out.println("\r" + sequence++);
                         if (checkGroups(arrayRecordTocheck, groups)) {
                             sum++;
@@ -60,7 +60,15 @@ public class Day12 {
         }
     }
 
+    static String[] _cachekey = new String[1000];
+    static String[] _cachevalue = new String[1000];
+
     private static char[] getConditionrecord(char[] rec, int pos) {
+        String recAsString = Arrays.toString(rec);
+        if (_cachekey[pos] != null && _cachekey[pos].equals(recAsString)) {
+            System.out.println("haal uit cache @" + pos);
+            return _cachevalue[pos].toCharArray();
+        }
         if (pos < rec.length) {
 
             if (rec[pos] != '.' && rec[pos] != '#') {
@@ -74,7 +82,10 @@ public class Day12 {
                 }
 
             }
-            return getConditionrecord(rec, pos + 1);
+            _cachekey[pos] = recAsString;
+            rec = getConditionrecord(rec, pos + 1);
+            _cachevalue[pos] = Arrays.toString(rec);
+
         }
         return rec;
     }
@@ -103,5 +114,13 @@ public class Day12 {
             return false;
         }
         return IntStream.range(0, groupindex).noneMatch(p -> foundGroups[p] != groups[p]);
+    }
+
+    private static boolean equals(char[] c1, char[] c2) {
+        if (c1.length != c2.length) return false;
+        for (int i = 0; i < c1.length; i++) {
+            if (c1[i] != c2[i]) return false;
+        }
+        return true;
     }
 }
