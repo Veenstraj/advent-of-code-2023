@@ -8,7 +8,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Day17 {
-    private static final String inputfile = "./day17/target/classes/input.txt";
+    private static final String inputfile = "./day17/target/classes/inputTst2.txt";
     private static final char[][] _map = new char[145][145];
     private static int _sizex;
     private static int _sizey;
@@ -58,7 +58,10 @@ public class Day17 {
 //        System.out.printf("%c total=%d dir=%c%d%n", getMap(x, y), totalDistance, direction, dirCount);
 
         setVst(direction, x, y);
-
+        if (checkVst()) {
+            printCoord(x, y);
+            printVisited("Detected! total=" + totalDistance);
+        }
         Set<Coord> adjacentNodes = determineNextNotVisitedNodeShortestPath(x, y);
         for (Coord coord : adjacentNodes) {
             char newDirection = getDirection(x, y, coord.x, coord.y);
@@ -67,10 +70,10 @@ public class Day17 {
                 int newDistance = totalDistance + coord.distance;
                 if (newDistance < _shortestPath) {
                     if (coord.x == _sizex - 1 && coord.y == _sizey - 1) {
-//                        printCoord(coord.x, coord.y);
-//                        System.out.printf(" Endpoint reached.. distance=%d%n", newDistance);
                         if (newDistance < _shortestPath) _shortestPath = newDistance;
-//                        printVisited("Visited");
+                        printCoord(coord.x, coord.y);
+                        printVisited(String.valueOf(newDistance));
+                        System.out.printf(" Endpoint reached.. distance=%d%n%n", newDistance);
                     } else {
                         zoekMinimaleHeatloss(coord.x, coord.y, newDistance, newDirection, newDirCount);
 //                    System.out.printf("< (%d,%d) total=%d, depth=%d%n", y+1, x+1, totalDistance, depth);
@@ -84,7 +87,7 @@ public class Day17 {
 //                System.out.println("Meer dan 3 achtereen");
             }
         }
-        setVst(x, y, (char) 0); // geef weer vrij
+        setVst(x, y, getMap(x, y)); // geef weer vrij
     }
 
     private static SortedSet<Coord> determineNextNotVisitedNodeShortestPath(int x, int y) {
@@ -98,8 +101,11 @@ public class Day17 {
     }
 
     private static void determineAdjacent(SortedSet<Coord> set, int x, int y) {
-        if (!isOutside(x, y) && getVst(x, y) == (char) 0) {
-            set.add(new Coord(x, y, getMap(x, y) - '0'));
+        if (!isOutside(x, y)) {
+            char a = getVst(x, y);
+            if (a == (char) 0 || (a >= '0' && a <= '9')) {
+                set.add(new Coord(x, y, getMap(x, y) - '0'));
+            }
         }
     }
 
@@ -108,6 +114,29 @@ public class Day17 {
         if (newx > x) return 'e';
         if (newy < y) return 'n';
         return 's';
+    }
+
+    private static boolean checkVst() {
+        String[] row = new String[]{
+                "v>>34^>>>1323",
+                "32v>>>35v5623",
+                "32552456v>>54",
+                "3446585845v52",
+                "4546657867v>6",
+                "14385987984v4",
+                "44578769877v6",
+                "36378779796v>",
+                "465496798688v",
+                "456467998645v",
+                "12246868655<v",
+                "25465488877v5"};
+
+        for (int y = 0; y < 2; y++) {
+            if (!row[y].equals(String.copyValueOf(_visited[y]))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void setVst(int x, int y, char value) {
