@@ -38,13 +38,14 @@ public class Day17_Dijkstra {
 
             _sizex = _map[0].length;
             _nodes = new Node[_sizey * _sizex];
+            int maxNodeId = _sizex * _sizey - 1;
             for (int y = 0; y < _sizey; y++) {
                 for (int x = 0; x < _sizex; x++) {
                     _nodes[x + y * _sizex] = new Node(x + y * _sizex, x, y);
                 }
             }
 
-            Graph graph = new Graph();
+            Graph graph = new Graph();  // Deze MOET hier geinstantieerd worden anders andere uitkomst????
 
             for (int y = 0; y < _sizey; y++) {
                 for (int x = 0; x < _sizex; x++) {
@@ -52,19 +53,17 @@ public class Day17_Dijkstra {
                     for (Node adjacentNode : adjacentNodes) {
                         _nodes[x + y * _sizex].addDestination(adjacentNode, getMap(adjacentNode.getX(), adjacentNode.getY()) - '0');
                     }
-                    graph.addNode(_nodes[x + y * _sizex]);
                 }
             }
 
-            System.out.printf("Node Shortest path = %s", _nodes[_sizey - 1 + _sizex * (_sizey - 1)].toString());
+            System.out.printf("Node Shortest path = %s", _nodes[maxNodeId].toString());
 
             dijkstra_algo(graph, _nodes[0]);
 
-            //System.out.println("Graph = " + graph);
+            System.out.printf("%nsizeX=%d, sizeY=%d, maxId=%d%n", _sizex, _sizey, maxNodeId);
 
-            System.out.printf("%nsizeX=%d, sizeY=%d, totaal=%d%n", _sizex, _sizey, _sizex - 1 + ((_sizey - 1) * _sizex));
-
-            System.out.printf("Node Shortest path = %s", _nodes[_sizey - 1 + _sizex * (_sizey - 1)].toString());
+            System.out.printf("Node Shortest path = %s", _nodes[maxNodeId].toString());
+            printMap(maxNodeId);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,32 +71,21 @@ public class Day17_Dijkstra {
         }
     }
 
-    private static Graph dijkstra_algo(Graph graph, Node source) {
+    private static void dijkstra_algo(Graph graph, Node source) {
         source.setDistance(0);
         Set<Node> settledNodes = new HashSet<>();
         Set<Node> unsettledNodes = new HashSet<>();
         unsettledNodes.add(source);
 
-
         while (unsettledNodes.size() != 0) {
             Node currentNode = getLowestDistanceNode(unsettledNodes);
             if (currentNode == null) {
-                int size = unsettledNodes.size();
-                Node[] nodes = new Node[size];
-                int index = 0;
-                for (Node node : unsettledNodes) {
-                    nodes[index++] = node;
-                }
-                for (int i = 0; i < index; i++) {
-                    unsettledNodes.remove(nodes[i]);
-                }
+                unsettledNodes = new HashSet<>(); // clear unsettled
             } else {
                 unsettledNodes.remove(currentNode);
-//            System.out.printf("Current %d (%d,%d) ", currentNode.getId(), currentNode.getX(), currentNode.getY());
                 for (Map.Entry<Node, Integer> adjacencyPair : currentNode.getAdjacentNodes().entrySet()) {
                     Node adjacentNode = adjacencyPair.getKey();
                     Integer edgeWeight = adjacencyPair.getValue();
-//                System.out.printf("Adjacent %d (%d, %d) ", adjacentNode.getId(), adjacentNode.getX(), adjacentNode.getY());
 
                     if (!settledNodes.contains(adjacentNode)) {
                         calculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
@@ -107,7 +95,6 @@ public class Day17_Dijkstra {
                 settledNodes.add(currentNode);
             }
         }
-        return graph;
     }
 
     private static Node getLowestDistanceNode(Set<Node> unsettledNodes) {
@@ -184,4 +171,22 @@ public class Day17_Dijkstra {
         return x < 0 || y < 0 || y >= _sizey || x >= _sizex;
     }
 
+    private static void printMap(int nodeId) {
+        Node node = _nodes[nodeId];
+        System.out.println("\n" + nodeId);
+        for (int y = 0; y < _sizey; y++) {
+            for (int x = 0; x < _sizex; x++) {
+                boolean found = false;
+                for (Node pathNode : node.getShortestPath()) {
+                    if (x == pathNode.getX() && y == pathNode.getY()) {
+                        System.out.print("#");
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) System.out.print(getMap(x, y));
+            }
+            System.out.println();
+        }
+    }
 }
