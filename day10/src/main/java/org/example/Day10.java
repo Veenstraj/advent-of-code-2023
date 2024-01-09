@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/* !! Zet VM Options op -Xss8M anders krijg je een stack overflow */
 public class Day10 {
 
     private static final char[][] _map = new char[140][140];
