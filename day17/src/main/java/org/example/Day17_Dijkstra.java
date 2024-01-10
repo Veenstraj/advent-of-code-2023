@@ -3,7 +3,11 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Day17_Dijkstra {
     private static final String inputfile = "./day17/target/classes/input.txt";
@@ -39,30 +43,36 @@ public class Day17_Dijkstra {
             _sizex = _map[0].length;
             _nodes = new Node[_sizey * _sizex];
             int maxNodeId = _sizex * _sizey - 1;
+
+            Graph graph = new Graph();
+
+
             for (int y = 0; y < _sizey; y++) {
                 for (int x = 0; x < _sizex; x++) {
                     _nodes[x + y * _sizex] = new Node(x + y * _sizex, x, y);
                 }
             }
 
-            Graph graph = new Graph();  // Deze MOET hier geinstantieerd worden anders andere uitkomst????
-
             for (int y = 0; y < _sizey; y++) {
                 for (int x = 0; x < _sizex; x++) {
-                    SortedSet<Node> adjacentNodes = getAdjacentNodes(x, y);
-                    for (Node adjacentNode : adjacentNodes) {
-                        _nodes[x + y * _sizex].addDestination(adjacentNode, getMap(adjacentNode.getX(), adjacentNode.getY()) - '0');
-                    }
+                    if (!isOutside(x - 1, y))
+                        _nodes[x + y * _sizex].addDestination(_nodes[x - 1 + y * _sizex], getMap(x - 1, y) - '0');
+                    if (!isOutside(x + 1, y))
+                        _nodes[x + y * _sizex].addDestination(_nodes[x + 1 + y * _sizex], getMap(x + 1, y) - '0');
+                    if (!isOutside(x, y - 1))
+                        _nodes[x + y * _sizex].addDestination(_nodes[x + (y - 1) * _sizex], getMap(x, y - 1) - '0');
+                    if (!isOutside(x, y + 1))
+                        _nodes[x + y * _sizex].addDestination(_nodes[x + (y + 1) * _sizex], getMap(x, y + 1) - '0');
+
+                    graph.addNode(_nodes[x + y * _sizex]);
                 }
             }
 
-            System.out.printf("Node Shortest path = %s", _nodes[maxNodeId].toString());
-
-            dijkstra_algo(graph, _nodes[0]);
+            dijkstra_algo(null, _nodes[0]);
 
             System.out.printf("%nsizeX=%d, sizeY=%d, maxId=%d%n", _sizex, _sizey, maxNodeId);
 
-            System.out.printf("Node Shortest path = %s", _nodes[maxNodeId].toString());
+            System.out.printf("Shortest path = %s", _nodes[maxNodeId].getDistance().toString());
             printMap(maxNodeId);
 
         } catch (IOException e) {
@@ -71,30 +81,34 @@ public class Day17_Dijkstra {
         }
     }
 
-    private static void dijkstra_algo(Graph graph, Node source) {
+    private static Graph dijkstra_algo(Graph graph, Node source) {
         source.setDistance(0);
         Set<Node> settledNodes = new HashSet<>();
         Set<Node> unsettledNodes = new HashSet<>();
         unsettledNodes.add(source);
 
-        while (unsettledNodes.size() != 0) {
+        while (!unsettledNodes.isEmpty()) {
             Node currentNode = getLowestDistanceNode(unsettledNodes);
             if (currentNode == null) {
-                unsettledNodes = new HashSet<>(); // clear unsettled
+                System.out.println("size=" + unsettledNodes.size());
+                unsettledNodes = new HashSet<>();
             } else {
+                System.out.printf("Current node=%d%n", currentNode.getId());
                 unsettledNodes.remove(currentNode);
                 for (Map.Entry<Node, Integer> adjacencyPair : currentNode.getAdjacentNodes().entrySet()) {
                     Node adjacentNode = adjacencyPair.getKey();
                     Integer edgeWeight = adjacencyPair.getValue();
 
                     if (!settledNodes.contains(adjacentNode)) {
-                        calculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
-                        unsettledNodes.add(adjacentNode);
+                        if (calculateMinimumDistance(adjacentNode, edgeWeight, currentNode)) {
+                            unsettledNodes.add(adjacentNode);
+                        }
                     }
                 }
                 settledNodes.add(currentNode);
             }
         }
+        return graph;
     }
 
     private static Node getLowestDistanceNode(Set<Node> unsettledNodes) {
@@ -110,15 +124,36 @@ public class Day17_Dijkstra {
         return lowestDistanceNode;
     }
 
-    private static void calculateMinimumDistance(Node evaluationNode, Integer edgeWeight, Node sourceNode) {
+    private static boolean calculateMinimumDistance(Node evaluationNode, Integer edgeWeight, Node sourceNode) {
+        boolean result = false;
+        System.out.printf(" call (%d, %d, %d)", evaluationNode.getId(), edgeWeight, sourceNode.getId());
         Integer sourceDistance = sourceNode.getDistance();
         if (sourceDistance + edgeWeight < evaluationNode.getDistance()) {
             LinkedList<Node> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
+            System.out.printf(" srcSp=" + getShortestPath(sourceNode.getShortestPath()) + ", sp=" + getShortestPath(shortestPath));
             if (checkOnDirectionOk(shortestPath, sourceNode)) {
                 evaluationNode.setDistance(sourceDistance + edgeWeight);
+                System.out.printf(" %d->%d: newDist of %d=%d ", sourceNode.getId(), evaluationNode.getId(), evaluationNode.getId(), sourceDistance + edgeWeight);
                 shortestPath.add(sourceNode);
                 evaluationNode.setShortestPath(shortestPath);
+                result = true;
+                System.out.printf(", Path of %d = " + getShortestPath(evaluationNode.getShortestPath()) + "%n", evaluationNode.getId());
+            } else {
+                System.out.printf("%d->%d: CheckOnDirectionOk=false%n", sourceNode.getId(), evaluationNode.getId());
             }
+        } else {
+            System.out.println(" path too long");
+        }
+        return result;
+    }
+
+    private static String getShortestPath(List<Node> sp) {
+        int size = Math.min(sp.stream().map(Node::getId).toList().size(), 5);
+        if (size == 5) {
+            return sp.stream().map(Node::getId).toList().subList(0, size).toString() + "..";
+        } else {
+            return sp.stream().map(Node::getId).toList().subList(0, size).toString();
+
         }
     }
 
@@ -137,22 +172,6 @@ public class Day17_Dijkstra {
         boolean result = dir1 != dir2 || dir2 != dir3 || dir3 != dir4;
 //        if (!result) System.out.printf("Node %d gaat ook naar %c -> NIET toevoegen aan shortest path.%n", newNode.getId(), dir1);
         return result;
-    }
-
-    private static SortedSet<Node> getAdjacentNodes(int x, int y) {
-        SortedSet<Node> adjacentNodes = new TreeSet<>();
-
-        determineAdjacent(adjacentNodes, x + 1, y);
-        determineAdjacent(adjacentNodes, x - 1, y);
-        determineAdjacent(adjacentNodes, x, y + 1);
-        determineAdjacent(adjacentNodes, x, y - 1);
-        return adjacentNodes;
-    }
-
-    private static void determineAdjacent(SortedSet<Node> set, int x, int y) {
-        if (!isOutside(x, y)) {
-            set.add(_nodes[x + y * _sizex]);
-        }
     }
 
     private static char getDirection(int x, int y, int newx, int newy) {

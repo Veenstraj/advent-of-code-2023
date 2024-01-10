@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Day17 {
@@ -90,8 +89,8 @@ public class Day17 {
         setVst(x, y, getMap(x, y)); // geef weer vrij
     }
 
-    private static SortedSet<Coord> determineNextNotVisitedNodeShortestPath(int x, int y) {
-        SortedSet<Coord> adjacentNodes = new TreeSet<>();
+    private static Set<Coord> determineNextNotVisitedNodeShortestPath(int x, int y) {
+        Set<Coord> adjacentNodes = new TreeSet<>();
 
         determineAdjacent(adjacentNodes, x + 1, y);
         determineAdjacent(adjacentNodes, x - 1, y);
@@ -100,7 +99,7 @@ public class Day17 {
         return adjacentNodes;
     }
 
-    private static void determineAdjacent(SortedSet<Coord> set, int x, int y) {
+    private static void determineAdjacent(Set<Coord> set, int x, int y) {
         if (!isOutside(x, y)) {
             char a = getVst(x, y);
             if (a == (char) 0 || (a >= '0' && a <= '9')) {

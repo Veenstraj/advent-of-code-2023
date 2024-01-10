@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 // The Class to handle nodes
-class Node implements Comparable<Node> {
+class Node {
     private int id;
 
     private final int x;
@@ -93,8 +93,8 @@ class Node implements Comparable<Node> {
         return result.toString();
     }
 
-    @Override
-    public int compareTo(Node o) {
-        return this.id - o.getId();
-    }
+    //   @Override
+    //   public int compareTo(Node o) {
+    //       return this.id - o.getId();
+    //   }
 }
