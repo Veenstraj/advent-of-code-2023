@@ -2,66 +2,107 @@ package org.example;
 
 public class Vector {
 
-    private Coord coord1;
-    private Coord coord2;
+    private Point point1;
+    private Point point2;
     private Direction direction;
 
-    public Vector(Coord coord1, Coord coord2) {
-        this.coord1 = coord1;
-        this.coord2 = coord2;
-        this.direction = getDirection(coord1, coord2);
+    public Vector(Point point1, Point point2) {
+        this.point1 = point1;
+        this.point2 = point2;
+        this.direction = getDirection(point1, point2);
+    }
+
+    public Point getPoint1() {
+        return point1;
+    }
+
+    public Point getPoint2() {
+        return point2;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 
     // (0,0) is in upper left corner
-    public Vector(Coord coord1, Direction dir, long nrOfsteps) {
-        this.coord1 = coord1;
+    public Vector(Point point1, Direction dir, long nrOfsteps) {
+        this.point1 = point1;
         this.direction = dir;
         switch (dir) {
-            case w -> this.coord2 = new Coord(coord1.x - nrOfsteps, coord1.y);
-            case e -> this.coord2 = new Coord(coord1.x + nrOfsteps, coord1.y);
-            case n -> this.coord2 = new Coord(coord1.x, coord1.y - nrOfsteps);
-            case s -> this.coord2 = new Coord(coord1.x, coord1.y + nrOfsteps);
+            case w -> this.point2 = new Point(point1.x - nrOfsteps, point1.y);
+            case e -> this.point2 = new Point(point1.x + nrOfsteps, point1.y);
+            case n -> this.point2 = new Point(point1.x, point1.y - nrOfsteps);
+            case s -> this.point2 = new Point(point1.x, point1.y + nrOfsteps);
         }
 
     }
 
-    public boolean isOnVector(Coord coord) {
-        return isXOnVector(coord.x) && isYOnVector(coord.y);
+    public Point intersect(Vector other) {
+        // Function to find the intersection point of two vectors
+
+        // Calculate the parameter values at the intersection point
+        long t = ((this.point1.x - other.point1.x) * (other.point1.y - other.point2.y)
+                - (this.point1.y - other.point1.y) * (other.point1.x - other.point2.x)) /
+                ((this.point1.x - this.point2.x) * (other.point1.y - other.point2.y)
+                        - (this.point1.y - this.point2.y) * (other.point1.x - other.point2.x));
+
+        long u = -((this.point1.x - this.point2.x) * (this.point1.y - other.point1.y)
+                - (this.point1.y - this.point2.y) * (this.point1.x - other.point1.x)) /
+                ((this.point1.x - this.point2.x) * (other.point1.y - other.point2.y)
+                        - (this.point1.y - this.point2.y) * (other.point1.x - other.point2.x));
+
+        //            // Check if the vectors intersect within their respective parameter ranges
+        if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+            return new Point(this.point1.x + t * (this.point2.x - this.point1.x), this.point1.y + t * (this.point2.y - this.point1.y));
+        } else {
+            return null;  // Vectors do not intersect
+        }
+
+//        private static double[] findIntersection(double x1, double y1, double x2, double y2,
+//        double x3, double y3, double x4, double y4) {
+//            double[] intersectionPoint = new double[2];
+//
+//            // Calculate the parameter values at the intersection point
+//            double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) /
+//                    ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
+//
+//            double u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) /
+//                    ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
+//
+//            // Check if the vectors intersect within their respective parameter ranges
+//            if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+//                intersectionPoint[0] = x1 + t * (x2 - x1);
+//                intersectionPoint[1] = y1 + t * (y2 - y1);
+//                return intersectionPoint;
+//            } else {
+//                return null;  // Vectors do not intersect
+//            }
+//        }
+
+
     }
 
-    public long getDistance(Coord coord) {
-        switch (getDirection(coord, coord1)) {
-            case n, s -> {
-                if (isXOnVector(coord.x)) {
-                    return Math.abs(coord.y - coord1.y);
-                }
-            }
-            case e, w -> {
-                if (isYOnVector(coord.y)) {
-                    return Math.abs(coord.y - coord1.y);
-                }
-            }
-        }
-        return Long.MAX_VALUE;
+    public boolean isOnVector(Point point) {
+        return isXOnVector(point.x) && isYOnVector(point.y);
     }
 
     private boolean isXOnVector(long x) {
-        long xmin = Math.min(coord1.x, coord2.x);
-        long xmax = Math.max(coord1.x, coord2.x);
+        long xmin = Math.min(point1.x, point2.x);
+        long xmax = Math.max(point1.x, point2.x);
         return (x >= xmin && x <= xmax);
 
     }
 
     private boolean isYOnVector(long y) {
-        long ymin = Math.min(coord1.y, coord2.y);
-        long ymax = Math.max(coord1.y, coord2.y);
+        long ymin = Math.min(point1.y, point2.y);
+        long ymax = Math.max(point1.y, point2.y);
         return y >= ymin && y <= ymax;
     }
 
-    private Direction getDirection(Coord coord1, Coord coord2) {
-        if (coord1.x < coord2.x) return Direction.e;
-        if (coord1.x > coord2.x) return Direction.w;
-        if (coord1.y < coord2.y) return Direction.s;
+    private Direction getDirection(Point point1, Point point2) {
+        if (point1.x < point2.x) return Direction.e;
+        if (point1.x > point2.x) return Direction.w;
+        if (point1.y < point2.y) return Direction.s;
         return Direction.n;
     }
 
@@ -69,14 +110,14 @@ public class Vector {
         w, e, n, s
     }
 
-    public static class Coord {
+    public static class Point {
 
         private long x;
         private long y;
         private long absx;
         private long absy;
 
-        public Coord(long x, long y) {
+        public Point(long x, long y) {
             this.x = x;
             this.y = y;
             this.absx = Math.abs(x);

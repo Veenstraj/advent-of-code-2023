@@ -3,18 +3,18 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Day18_part2 {
-    private static final String inputfile = "./day18/target/classes/inputTst.txt";
+    private static final String inputfile = "./day18/target/classes/input.txt";
 
-    private static final int CENTRE_X = 15000;
-    private static final int CENTRE_Y = CENTRE_X;
-    private static final char[][] _map = new char[2 * CENTRE_Y][2 * CENTRE_X];
+    private static final Set<Vector> _vectorList = new HashSet<>();
 
-    private static int _minx = CENTRE_X;
-    private static int _maxx = 0;
-    private static int _miny = CENTRE_Y;
-    private static int _maxy = 0;
+    private static long _minx = Long.MAX_VALUE;
+    private static long _maxx = 0;
+    private static long _miny = Long.MAX_VALUE;
+    private static long _maxy = 0;
 
     public static void main(String[] args) {
 
@@ -25,56 +25,50 @@ public class Day18_part2 {
         BufferedReader reader;
 
         try {
+            Vector.Point currentPoint = new Vector.Point(0, 0);
             reader = new BufferedReader(new FileReader(inputfile));
             String line = reader.readLine();
-            int x = 0;
-            int y = 0;
             int sum = 0;
             while (line != null) {
                 if (line.trim().length() > 0) {
-                    //String richting = line.trim().split(" ")[0];
-                    //int nrOfMeters = Integer.valueOf(line.trim().split(" ")[1]);
+//                    String richting = line.trim().split(" ")[0];
+//                    int nrOfMeters = Integer.valueOf(line.trim().split(" ")[1]);
                     String color = line.trim().split(" ")[2];
-                    String richting = color.substring(7,8);
-                    int nrOfMeters = Integer.decode("0x" + color.substring(2,7));
+                    String richting = color.substring(7, 8);
+                    int nrOfMeters = Integer.decode("0x" + color.substring(2, 7));
                     switch (richting) {
-                        case "0" -> { //R
-                            for (int i = 0; i < nrOfMeters; i++) {
-                                setMap(y, x + i, '#');
-                            }
-                            x += nrOfMeters;
+                        case "0", "R" -> { //R (east)
+                            Vector vector = new Vector(currentPoint, Vector.Direction.e, nrOfMeters);
+                            _vectorList.add(vector);
+                            currentPoint = vector.getPoint2();
                         }
-                        case "2" -> { //L
-                            for (int i = 0; i < nrOfMeters; i++) {
-                                setMap(y, x - i, '#');
-                            }
-                            x -= nrOfMeters;
+                        case "2", "L" -> { //L (west)
+                            Vector vector = new Vector(currentPoint, Vector.Direction.w, nrOfMeters);
+                            _vectorList.add(vector);
+                            currentPoint = vector.getPoint2();
                         }
-                        case "3" -> { //U
-                            for (int i = 0; i < nrOfMeters; i++) {
-                                setMap(y - i, x, '#');
-                            }
-                            y -= nrOfMeters;
+                        case "3", "U" -> { //U (north)
+                            Vector vector = new Vector(currentPoint, Vector.Direction.n, nrOfMeters);
+                            _vectorList.add(vector);
+                            currentPoint = vector.getPoint2();
                         }
-                        case "1" -> { //D
-                            for (int i = 0; i < nrOfMeters; i++) {
-                                setMap(y + i, x, '#');
-                            }
-                            y += nrOfMeters;
+                        case "1", "D" -> { //D (south)
+                            Vector vector = new Vector(currentPoint, Vector.Direction.s, nrOfMeters);
+                            _vectorList.add(vector);
+                            currentPoint = vector.getPoint2();
                         }
                     }
-                    _maxx = Math.max(x + 2, _maxx);
-                    _maxy = Math.max(y + 2, _maxy);
-                    _minx = Math.min(x - 1, _minx);
-                    _miny = Math.min(y - 1, _miny);
+                    _maxx = Math.max(currentPoint.getX(), _maxx);
+                    _maxy = Math.max(currentPoint.getY(), _maxy);
+                    _minx = Math.min(currentPoint.getX(), _minx);
+                    _miny = Math.min(currentPoint.getY(), _miny);
                 }
                 // read next line
                 line = reader.readLine();
             }
             reader.close();
-            digout();
-            digout();
-            sum = printMap();
+//            digout();
+//            sum = printMap();
             System.out.printf("minx=%d, miny=%d, maxx=%d, maxy=%d%n", _minx, _miny, _maxx, _maxy);
 
             System.out.println("sum=" + sum);
@@ -83,65 +77,5 @@ public class Day18_part2 {
             e.printStackTrace();
 
         }
-    }
-
-    private static void digout() {
-        setMap(_miny, _minx, '.'); // upper left corner is Outside
-        for (int y = _miny; y < _maxy; y++) {
-            for (int x = _minx; x < _maxx; x++) {
-                setMapDot(y, x);
-            }
-        }
-        setMap(_maxy - 1, _maxx - 1, '.'); // lower right corner is Outside
-        for (int x = _maxx - 1; x >= _minx; x--) {
-            for (int y = _maxy - 1; y >= _miny; y--) {
-                setMapDot(y, x);
-            }
-        }
-        setMap(_maxy - 1, _minx, '.'); // lower left corner is Outside
-        for (int y = _maxy - 1; y >= _miny; y--) {
-            for (int x = _minx; x < _maxx; x++) {
-                setMapDot(y, x);
-            }
-        }
-        setMap(_miny, _maxx - 1, '.'); // upper right corner is Outside
-        for (int x = _maxx - 1; x >= _minx; x--) {
-            for (int y = _miny; y < _maxy; y++) {
-                setMapDot(y, x);
-            }
-        }
-
-    }
-
-    private static void setMapDot(int y, int x) {
-        if (getMap(y, x) == '#') return;
-        if (!isOutside(x - 1, y) && getMap(y, x - 1) == '.') setMap(y, x, '.');
-        if (!isOutside(x + 1, y) && getMap(y, x + 1) == '.') setMap(y, x, '.');
-        if (!isOutside(x, y - 1) && getMap(y - 1, x) == '.') setMap(y, x, '.');
-        if (!isOutside(x, y + 1) && getMap(y + 1, x) == '.') setMap(y, x, '.');
-    }
-
-    private static boolean isOutside(int x, int y) {
-        return x < _minx || y < _miny || y >= _maxy || x >= _maxx;
-    }
-
-    private static void setMap(int y, int x, char c) {
-        _map[y + CENTRE_Y][x + CENTRE_X] = c;
-    }
-
-    private static char getMap(int y, int x) {
-        return _map[y + CENTRE_Y][x + CENTRE_X];
-    }
-
-    private static int printMap() {
-        int count = 0;
-        for (int y = _miny; y < _maxy; y++) {
-            for (int x = _minx; x < _maxx; x++) {
-                System.out.printf("%c", getMap(y, x));
-                if (getMap(y, x) == '#' || getMap(y, x) == 0) count++;
-            }
-            System.out.println();
-        }
-        return count;
     }
 }
