@@ -1,4 +1,4 @@
-/home/gebruiker/.jdks/corretto-17.0.9/bin/java -javaagent:/home/gebruiker/idea-IC-231.9011.34/lib/idea_rt.jar=42569:/home/gebruiker/idea-IC-231.9011.34/bin -Dfile.encoding=UTF-8 -classpath /home/gebruiker/IdeaProjects/advent-of-code-2023_2/day18/target/classes org.example.Day18
+/home/gebruiker/.jdks/corretto-17.0.9/bin/java -javaagent:/home/gebruiker/idea-IC-231.9011.34/lib/idea_rt.jar=42569:/home/gebruiker/idea-IC-231.9011.34/bin -Dfile.encoding=UTF-8 -classpath /home/gebruiker/IdeaProjects/advent-of-code-2023_2/day18/target/classes org.example.Day18_part1
                                                                                                                                                                 #####
                                                                                                                                                                 #   #
                                                                                                                                                                 #   #
