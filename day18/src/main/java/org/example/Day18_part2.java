@@ -24,6 +24,7 @@ public class Day18_part2 {
     public static void opgave2() {
         BufferedReader reader;
 
+
         try {
             Vector.Point currentPoint = new Vector.Point(0, 0);
             reader = new BufferedReader(new FileReader(inputfile));

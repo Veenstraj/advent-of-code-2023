@@ -2,6 +2,44 @@ package org.example;
 
 public class Vector {
 
+    public static void main(String[] args) {
+        // Define the first vector
+        Point point1 = new Point(1, 2);
+        Point point2 = new Point(4, 5);
+        Vector vector1 = new Vector(point1, point2);
+
+        double x1 = 1, y1 = 2;  // Starting point
+        double x2 = 5, y2 = 4;  // Ending point
+
+        Point point3 = new Point(2, 1);
+        Point point4 = new Point(5, 4);
+        Vector vector2 = new Vector(point3, point4);
+        // Define the second vector
+        double x3 = 2, y3 = 1;  // Starting point
+        double x4 = 4, y4 = 5;  // Ending point
+
+        // Calculate the intersection point
+        Point intersectionPoint = vector1.intersect(vector2);
+        //double[] intersectionPoint = findIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
+
+        // Check if the vectors intersect
+        if (intersectionPoint != null) {
+            System.out.println("Vectors intersect at point (" + intersectionPoint.x + ", " + intersectionPoint.y + ")");
+        } else {
+            System.out.println("Vectors do not intersect");
+        }
+        // Calculate the intersection point
+        intersectionPoint = vector2.intersect(vector1);
+        //double[] intersectionPoint = findIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
+
+        // Check if the vectors intersect
+        if (intersectionPoint != null) {
+            System.out.println("Vectors intersect at point (" + intersectionPoint.x + ", " + intersectionPoint.y + ")");
+        } else {
+            System.out.println("Vectors do not intersect");
+        }
+    }
+
     private Point point1;
     private Point point2;
     private Direction direction;
@@ -41,12 +79,12 @@ public class Vector {
         // Function to find the intersection point of two vectors
 
         // Calculate the parameter values at the intersection point
-        long t = ((this.point1.x - other.point1.x) * (other.point1.y - other.point2.y)
+        Long t = ((this.point1.x - other.point1.x) * (other.point1.y - other.point2.y)
                 - (this.point1.y - other.point1.y) * (other.point1.x - other.point2.x)) /
                 ((this.point1.x - this.point2.x) * (other.point1.y - other.point2.y)
                         - (this.point1.y - this.point2.y) * (other.point1.x - other.point2.x));
 
-        long u = -((this.point1.x - this.point2.x) * (this.point1.y - other.point1.y)
+        Long u = -((this.point1.x - this.point2.x) * (this.point1.y - other.point1.y)
                 - (this.point1.y - this.point2.y) * (this.point1.x - other.point1.x)) /
                 ((this.point1.x - this.point2.x) * (other.point1.y - other.point2.y)
                         - (this.point1.y - this.point2.y) * (other.point1.x - other.point2.x));

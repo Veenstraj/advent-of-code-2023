@@ -5,11 +5,11 @@ public class Sample {
     public static void main(String[] args) {
         // Define the first vector
         double x1 = 1, y1 = 2;  // Starting point
-        double x2 = 4, y2 = 5;  // Ending point
+        double x2 = 5, y2 = 4;  // Ending point
 
         // Define the second vector
         double x3 = 2, y3 = 1;  // Starting point
-        double x4 = 5, y4 = 4;  // Ending point
+        double x4 = 4, y4 = 5;  // Ending point
 
         // Calculate the intersection point
         double[] intersectionPoint = findIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
