@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Day18_part1 {
-    private static final String inputfile = "./day18/target/classes/input.txt";
+    private static final String inputfile = "./day18/target/classes/inputTst_jos.txt";
 
     private static final int CENTRE_X = 500;
     private static final int CENTRE_Y = 500;
@@ -133,12 +133,14 @@ public class Day18_part1 {
 
     private static int printMap() {
         int count = 0;
+        int prevCount = 0;
         for (int y = _miny; y < _maxy; y++) {
             for (int x = _minx; x < _maxx; x++) {
                 System.out.printf("%c", getMap(y, x));
                 if (getMap(y, x) == '#' || getMap(y, x) == 0) count++;
             }
-            System.out.println();
+            System.out.printf("%d: delta=%d, innerBlocks=%d%n", y, count - prevCount, count);
+            prevCount = count;
         }
         return count;
     }

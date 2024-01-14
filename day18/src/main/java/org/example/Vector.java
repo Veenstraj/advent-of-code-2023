@@ -1,53 +1,35 @@
 package org.example;
 
+import java.awt.*;
+
 public class Vector {
+    private final int id;
 
-    public static void main(String[] args) {
-        // Define the first vector
-        Point point1 = new Point(1, 2);
-        Point point2 = new Point(4, 5);
-        Vector vector1 = new Vector(point1, point2);
-
-        double x1 = 1, y1 = 2;  // Starting point
-        double x2 = 5, y2 = 4;  // Ending point
-
-        Point point3 = new Point(2, 1);
-        Point point4 = new Point(5, 4);
-        Vector vector2 = new Vector(point3, point4);
-        // Define the second vector
-        double x3 = 2, y3 = 1;  // Starting point
-        double x4 = 4, y4 = 5;  // Ending point
-
-        // Calculate the intersection point
-        Point intersectionPoint = vector1.intersect(vector2);
-        //double[] intersectionPoint = findIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
-
-        // Check if the vectors intersect
-        if (intersectionPoint != null) {
-            System.out.println("Vectors intersect at point (" + intersectionPoint.x + ", " + intersectionPoint.y + ")");
-        } else {
-            System.out.println("Vectors do not intersect");
-        }
-        // Calculate the intersection point
-        intersectionPoint = vector2.intersect(vector1);
-        //double[] intersectionPoint = findIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
-
-        // Check if the vectors intersect
-        if (intersectionPoint != null) {
-            System.out.println("Vectors intersect at point (" + intersectionPoint.x + ", " + intersectionPoint.y + ")");
-        } else {
-            System.out.println("Vectors do not intersect");
-        }
-    }
-
-    private Point point1;
+    private final Point point1;
     private Point point2;
-    private Direction direction;
+    private final Dir direction;
+    private final int length;
+    private Dir inside;
+    private final int xmin, xmax, ymin, ymax;
 
-    public Vector(Point point1, Point point2) {
+    // (0,0) is in upper left corner
+    public Vector(int id, Point point1, Dir dir, int length) {
+        this.id = id;
         this.point1 = point1;
-        this.point2 = point2;
-        this.direction = getDirection(point1, point2);
+
+        this.direction = dir;
+        this.length = length;
+        switch (dir) {
+            case w -> this.point2 = new Point(point1.x - length, point1.y);
+            case e -> this.point2 = new Point(point1.x + length, point1.y);
+            case n -> this.point2 = new Point(point1.x, point1.y - length);
+            case s -> this.point2 = new Point(point1.x, point1.y + length);
+        }
+        xmin = Math.min(point1.x, point2.x);
+        xmax = Math.max(point1.x, point2.x);
+        ymin = Math.min(point1.y, point2.y);
+        ymax = Math.max(point1.y, point2.y);
+//        System.out.printf("Vector %d: %s -> %s%n", id, point1, point2);
     }
 
     public Point getPoint1() {
@@ -58,124 +40,112 @@ public class Vector {
         return point2;
     }
 
-    public Direction getDirection() {
+    public Dir getDirection() {
         return direction;
     }
 
-    // (0,0) is in upper left corner
-    public Vector(Point point1, Direction dir, long nrOfsteps) {
-        this.point1 = point1;
-        this.direction = dir;
-        switch (dir) {
-            case w -> this.point2 = new Point(point1.x - nrOfsteps, point1.y);
-            case e -> this.point2 = new Point(point1.x + nrOfsteps, point1.y);
-            case n -> this.point2 = new Point(point1.x, point1.y - nrOfsteps);
-            case s -> this.point2 = new Point(point1.x, point1.y + nrOfsteps);
-        }
-
+    public int getId() {
+        return id;
     }
 
-    public Point intersect(Vector other) {
+    public PointPlus intersect(Vector that) {
         // Function to find the intersection point of two vectors
+        float x1 = this.point1.x, y1 = this.point1.y;
+        float x2 = this.point2.x, y2 = this.point2.y;
+        float x3 = that.point1.x, y3 = that.point1.y;
+        float x4 = that.point2.x, y4 = that.point2.y;
 
         // Calculate the parameter values at the intersection point
-        Long t = ((this.point1.x - other.point1.x) * (other.point1.y - other.point2.y)
-                - (this.point1.y - other.point1.y) * (other.point1.x - other.point2.x)) /
-                ((this.point1.x - this.point2.x) * (other.point1.y - other.point2.y)
-                        - (this.point1.y - this.point2.y) * (other.point1.x - other.point2.x));
+        double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) /
+                ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
 
-        Long u = -((this.point1.x - this.point2.x) * (this.point1.y - other.point1.y)
-                - (this.point1.y - this.point2.y) * (this.point1.x - other.point1.x)) /
-                ((this.point1.x - this.point2.x) * (other.point1.y - other.point2.y)
-                        - (this.point1.y - this.point2.y) * (other.point1.x - other.point2.x));
+        double u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) /
+                ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
 
-        //            // Check if the vectors intersect within their respective parameter ranges
+        // Check if the vectors intersect within their respective parameter ranges
         if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-            return new Point(this.point1.x + t * (this.point2.x - this.point1.x), this.point1.y + t * (this.point2.y - this.point1.y));
-        } else {
-            return null;  // Vectors do not intersect
+            return new PointPlus(
+                    new Point((int) Math.floor((this.point1.x + t * (this.point2.x - this.point1.x) + 0.5)), (int) Math.floor((this.point1.y + t * (this.point2.y - this.point1.y) + 0.5))),
+                    that);
         }
-
-//        private static double[] findIntersection(double x1, double y1, double x2, double y2,
-//        double x3, double y3, double x4, double y4) {
-//            double[] intersectionPoint = new double[2];
-//
-//            // Calculate the parameter values at the intersection point
-//            double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) /
-//                    ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
-//
-//            double u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) /
-//                    ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
-//
-//            // Check if the vectors intersect within their respective parameter ranges
-//            if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-//                intersectionPoint[0] = x1 + t * (x2 - x1);
-//                intersectionPoint[1] = y1 + t * (y2 - y1);
-//                return intersectionPoint;
-//            } else {
-//                return null;  // Vectors do not intersect
-//            }
-//        }
-
-
+        return null;  // Vectors do not intersect
     }
 
-    public boolean isOnVector(Point point) {
-        return isXOnVector(point.x) && isYOnVector(point.y);
-    }
-
-    private boolean isXOnVector(long x) {
-        long xmin = Math.min(point1.x, point2.x);
-        long xmax = Math.max(point1.x, point2.x);
+    public boolean isXOnVector(int x) {
         return (x >= xmin && x <= xmax);
-
     }
 
-    private boolean isYOnVector(long y) {
-        long ymin = Math.min(point1.y, point2.y);
-        long ymax = Math.max(point1.y, point2.y);
+    public boolean isYOnVector(int y) {
         return y >= ymin && y <= ymax;
     }
 
-    private Direction getDirection(Point point1, Point point2) {
-        if (point1.x < point2.x) return Direction.e;
-        if (point1.x > point2.x) return Direction.w;
-        if (point1.y < point2.y) return Direction.s;
-        return Direction.n;
+    public int getLength() {
+        return length;
     }
 
-    public static enum Direction {
+    private Dir getDirection(Point point1, Point point2) {
+        if (point1.x < point2.x) return Dir.e;
+        if (point1.x > point2.x) return Dir.w;
+        if (point1.y < point2.y) return Dir.s;
+        return Dir.n;
+    }
+
+    public Dir getInside() {
+        return inside;
+    }
+
+    public void setInside(Dir inside) {
+        this.inside = inside;
+    }
+
+    public void setInside(Vector previous) {
+        switch (previous.getDirection()) {
+            case w -> {
+                switch (this.direction) {
+                    case w -> throw new RuntimeException("In het verlengde");
+                    case e -> throw new RuntimeException("terug");
+                    case n -> this.inside = (previous.inside == Dir.n ? Dir.e : Dir.w);
+                    case s -> this.inside = (previous.inside == Dir.n ? Dir.w : Dir.e);
+                }
+            }
+            case e -> {
+                switch (this.direction) {
+                    case w -> throw new RuntimeException("terug");
+                    case e -> throw new RuntimeException("In het verlengde");
+                    case n -> this.inside = (previous.inside == Dir.n ? Dir.w : Dir.e);
+                    case s -> this.inside = (previous.inside == Dir.n ? Dir.e : Dir.w);
+                }
+            }
+            case n -> {
+                switch (this.direction) {
+                    case w -> this.inside = (previous.inside == Dir.w ? Dir.s : Dir.n);
+                    case e -> this.inside = (previous.inside == Dir.w ? Dir.n : Dir.s);
+                    case n -> throw new RuntimeException("In het verlengde");
+                    case s -> throw new RuntimeException("terug");
+                }
+            }
+            case s -> {
+                switch (this.direction) {
+                    case w -> this.inside = (previous.inside == Dir.w ? Dir.n : Dir.s);
+                    case e -> this.inside = (previous.inside == Dir.w ? Dir.s : Dir.n);
+                    case n -> throw new RuntimeException("terug");
+                    case s -> throw new RuntimeException("In het verlengde");
+                }
+            }
+        }
+    }
+
+    public enum Dir {
         w, e, n, s
     }
 
-    public static class Point {
+    public static class PointPlus {
+        public Point point;
+        public Vector vector;
 
-        private long x;
-        private long y;
-        private long absx;
-        private long absy;
-
-        public Point(long x, long y) {
-            this.x = x;
-            this.y = y;
-            this.absx = Math.abs(x);
-            this.absy = Math.abs(y);
-        }
-
-        public long getX() {
-            return x;
-        }
-
-        public long getY() {
-            return y;
-        }
-
-        public long getAbsX() {
-            return absx;
-        }
-
-        public long getAbsY() {
-            return absy;
+        public PointPlus(Point point, Vector vector) {
+            this.point = point;
+            this.vector = vector;
         }
     }
 }
