@@ -4,8 +4,11 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
 
 public class Day18_part2 {
     private static final String inputfile = "./day18/target/classes/input.txt";
@@ -48,24 +51,23 @@ public class Day18_part2 {
                     switch (richting) {
                         case "0", "R" -> { //R (east)
                             vector = new Vector(vectorId, currentPoint, Vector.Dir.e, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.s);
+                            if (prevVector == null) vector.setInside(Vector.Dir.s);  // Aanname: rechtsom
                         }
                         case "2", "L" -> { //L (west)
                             vector = new Vector(vectorId, currentPoint, Vector.Dir.w, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.n);
+                            if (prevVector == null) vector.setInside(Vector.Dir.n);  // Aanname: rechtsom
                         }
                         case "3", "U" -> { //U (north)
                             vector = new Vector(vectorId, currentPoint, Vector.Dir.n, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.e);
+                            if (prevVector == null) vector.setInside(Vector.Dir.e);  // Aanname: rechtsom
                         }
                         case "1", "D" -> { //D (south)
                             vector = new Vector(vectorId, currentPoint, Vector.Dir.s, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.w);
+                            if (prevVector == null) vector.setInside(Vector.Dir.w);  // Aanname: rechtsom
                         }
                     }
                     if (prevVector != null) {
-                        vector.setInside(prevVector);
-                        //       System.out.println("gcd=" + getGcd(prevVector.getLength(), vector.getLength()));
+                        vector.setInside(prevVector); // Inside geeft aan waar de binnenkant is aan de rand van de vijver
                     }
                     prevVector = vector;
                     _vectorList.add(vector);
@@ -81,7 +83,7 @@ public class Day18_part2 {
             }
             reader.close();
             System.out.printf("minx=%d, miny=%d, maxx=%d, maxy=%d%n", _minx, _miny, _maxx, _maxy);
-            sum = digout(); // 14-01 82712743088415 (652 s) too low
+            sum = digout(); // 14-01 82712743088415 (652 s) too low  - 15-01 82712746433310 (108 s) ok
             System.out.println("\nsum=" + sum);
 
         } catch (IOException e) {
@@ -137,8 +139,8 @@ public class Day18_part2 {
             }
         }
         long timenow = System.currentTimeMillis();
-        System.out.printf("%d ms elapsed", timenow - dateTime);
-        return (long) insideBlocks;
+        System.out.printf("%d ms elapsed%n", timenow - dateTime);
+        return insideBlocks;
     }
 
     private static boolean findVectorWest(Point point) {

@@ -50,10 +50,10 @@ public class Vector {
 
     public PointPlus intersect(Vector that) {
         // Function to find the intersection point of two vectors
-        float x1 = this.point1.x, y1 = this.point1.y;
-        float x2 = this.point2.x, y2 = this.point2.y;
-        float x3 = that.point1.x, y3 = that.point1.y;
-        float x4 = that.point2.x, y4 = that.point2.y;
+        double x1 = this.point1.x, y1 = this.point1.y;
+        double x2 = this.point2.x, y2 = this.point2.y;
+        double x3 = that.point1.x, y3 = that.point1.y;
+        double x4 = that.point2.x, y4 = that.point2.y;
 
         // Calculate the parameter values at the intersection point
         double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) /
@@ -102,16 +102,12 @@ public class Vector {
         switch (previous.getDirection()) {
             case w -> {
                 switch (this.direction) {
-                    case w -> throw new RuntimeException("In het verlengde");
-                    case e -> throw new RuntimeException("terug");
                     case n -> this.inside = (previous.inside == Dir.n ? Dir.e : Dir.w);
                     case s -> this.inside = (previous.inside == Dir.n ? Dir.w : Dir.e);
                 }
             }
             case e -> {
                 switch (this.direction) {
-                    case w -> throw new RuntimeException("terug");
-                    case e -> throw new RuntimeException("In het verlengde");
                     case n -> this.inside = (previous.inside == Dir.n ? Dir.w : Dir.e);
                     case s -> this.inside = (previous.inside == Dir.n ? Dir.e : Dir.w);
                 }
@@ -120,16 +116,12 @@ public class Vector {
                 switch (this.direction) {
                     case w -> this.inside = (previous.inside == Dir.w ? Dir.s : Dir.n);
                     case e -> this.inside = (previous.inside == Dir.w ? Dir.n : Dir.s);
-                    case n -> throw new RuntimeException("In het verlengde");
-                    case s -> throw new RuntimeException("terug");
                 }
             }
             case s -> {
                 switch (this.direction) {
                     case w -> this.inside = (previous.inside == Dir.w ? Dir.n : Dir.s);
                     case e -> this.inside = (previous.inside == Dir.w ? Dir.s : Dir.n);
-                    case n -> throw new RuntimeException("terug");
-                    case s -> throw new RuntimeException("In het verlengde");
                 }
             }
         }
