@@ -1,7 +1,5 @@
 package com.adventofcode.day17;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +20,6 @@ import java.util.Set;
 
 public class Main {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private final HashMap<Position, Integer> maze = new LinkedHashMap<>();
     private int maxX = 0;
@@ -32,8 +29,8 @@ public class Main {
         Main main = new Main();
         main.readFile("com/adventofcode/day17/inputfile_full.txt");
         main.printMaze();
-        LOGGER.info("Part-1, Shortest path, minimal costs: {}", main.mazeWalker(false));
-        LOGGER.info("Part-2, Shortest path, minimal costs: {}", main.mazeWalker(true));
+        System.out.printf("Part-1, Shortest path, minimal costs: %s", main.mazeWalker(false));
+        System.out.printf("Part-2, Shortest path, minimal costs: %s", main.mazeWalker(true));
     }
 
     private int mazeWalker(boolean useUltra) {
