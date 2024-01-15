@@ -128,7 +128,12 @@ public class Vector {
     }
 
     public enum Dir {
-        w, e, n, s
+        w(2), e(0), n(3), s(1);
+        public final int number;
+
+        private Dir(int number) {
+            this.number = number;
+        }
     }
 
     public static class PointPlus {

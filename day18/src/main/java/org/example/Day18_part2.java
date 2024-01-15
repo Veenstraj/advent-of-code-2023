@@ -4,11 +4,8 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Day18_part2 {
     private static final String inputfile = "./day18/target/classes/input.txt";
@@ -27,14 +24,14 @@ public class Day18_part2 {
 
     public static void opgave(boolean opgave1) {
         BufferedReader reader;
+        Point currentPoint = new Point(0, 0);
+        Vector vector = null, prevVector = null;
+        long sum = 0;
+        int vectorId = 0;
 
         try {
-            Point currentPoint = new Point(0, 0);
             reader = new BufferedReader(new FileReader(inputfile));
             String line = reader.readLine();
-            long sum = 0;
-            int vectorId = 0;
-            Vector vector = null, prevVector = null;
             while (line != null) {
                 if (line.trim().length() > 0) {
                     String richting;
@@ -48,24 +45,7 @@ public class Day18_part2 {
                         nrOfMeters = Integer.decode("0x" + color.substring(2, 7));
                     }
                     // System.out.printf("#meters=%d ", nrOfMeters);
-                    switch (richting) {
-                        case "0", "R" -> { //R (east)
-                            vector = new Vector(vectorId, currentPoint, Vector.Dir.e, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.s);  // Aanname: rechtsom
-                        }
-                        case "2", "L" -> { //L (west)
-                            vector = new Vector(vectorId, currentPoint, Vector.Dir.w, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.n);  // Aanname: rechtsom
-                        }
-                        case "3", "U" -> { //U (north)
-                            vector = new Vector(vectorId, currentPoint, Vector.Dir.n, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.e);  // Aanname: rechtsom
-                        }
-                        case "1", "D" -> { //D (south)
-                            vector = new Vector(vectorId, currentPoint, Vector.Dir.s, nrOfMeters);
-                            if (prevVector == null) vector.setInside(Vector.Dir.w);  // Aanname: rechtsom
-                        }
-                    }
+                    vector = createVector(richting, nrOfMeters, vectorId, prevVector, currentPoint);
                     if (prevVector != null) {
                         vector.setInside(prevVector); // Inside geeft aan waar de binnenkant is aan de rand van de vijver
                     }
@@ -88,58 +68,91 @@ public class Day18_part2 {
 
         } catch (IOException e) {
             e.printStackTrace();
-
         }
+    }
+
+    private static Vector createVector(String richting, int nrOfMeters, int vectorId, Vector prevVector, Point currentPoint) {
+        Vector vector = null;
+        switch (richting) {
+            case "0", "R" -> { //R (east)
+                vector = new Vector(vectorId, currentPoint, Vector.Dir.e, nrOfMeters);
+                if (prevVector == null) vector.setInside(Vector.Dir.s);  // Aanname: rechtsom
+            }
+            case "2", "L" -> { //L (west)
+                vector = new Vector(vectorId, currentPoint, Vector.Dir.w, nrOfMeters);
+                if (prevVector == null) vector.setInside(Vector.Dir.n);  // Aanname: rechtsom
+            }
+            case "3", "U" -> { //U (north)
+                vector = new Vector(vectorId, currentPoint, Vector.Dir.n, nrOfMeters);
+                if (prevVector == null) vector.setInside(Vector.Dir.e);  // Aanname: rechtsom
+            }
+            case "1", "D" -> { //D (south)
+                vector = new Vector(vectorId, currentPoint, Vector.Dir.s, nrOfMeters);
+                if (prevVector == null) vector.setInside(Vector.Dir.w);  // Aanname: rechtsom
+            }
+        }
+        return vector;
     }
 
     private static long digout() {
         long counter = 0;
         long dateTime = System.currentTimeMillis();
-        long prevIb = 0;
         long insideBlocks = 0;
-        for (int y = _miny; y <= _maxy; y++) {
-            Vector outside = new Vector(-1, new Point(_minx, y), Vector.Dir.e, _maxx - _minx);
-            int finalY = y;
-            List<Vector.PointPlus> intersects = _vectorList.stream()
-                    .filter(v -> v.isYOnVector(finalY))
-                    .map(outside::intersect)
-                    .filter(Objects::nonNull)
-                    .sorted(Comparator.comparingInt(n -> n.point.x))
-                    .toList();
 
-            int lastx = _minx;
-            boolean isInside = false;
-            long intersect = 0;
+        for (int y = _miny; y <= _maxy; y++) {
 //            System.out.printf("%d: ", y);
-            for (Vector.PointPlus pp : intersects) {
-                if (isInside) {
-                    intersect = pp.point.x - lastx + 1; //dikte 2 vectoren
-                    insideBlocks += intersect;
-                    lastx = pp.point.x + 1;
-                } else {
-                    intersect = pp.point.x - lastx - 1;
-                    lastx = pp.point.x;
-                }
-//                System.out.printf(" (%d,%d)%s d=%d (%b), ", pp.point.x, pp.point.y, pp.vector.getDirection(), intersect, isInside);
-                isInside = pp.vector.getInside() == Vector.Dir.e; // set for next iteration
-                // when distance is an east-west vector, it is always inside
-                if (pp.vector.getPoint1().equals(pp.point) && findVectorWest(pp.point)) {
-//                    System.out.printf(" vw ");
-                    isInside = true;
-                }
-                if (pp.vector.getPoint2().equals(pp.point) && findVectorEast(pp.point)) {
-//                System.out.printf(" ve ");
-                    isInside = true;
-                }
-            }
-//            System.out.printf("delta=%d, innerBlocks=%d%n", insideBlocks - prevIb, insideBlocks);
-            prevIb = insideBlocks;
+            Vector entireX = new Vector(-1, new Point(_minx, y), Vector.Dir.e, _maxx - _minx);
+
+            List<Vector.PointPlus> intersects = getIntersects(entireX, y);
+            long delta = determineInsideBocks(intersects);
+            insideBlocks += delta;
+
+//            System.out.printf("delta=%d, innerBlocks=%d%n", delta, insideBlocks);
             if (++counter % 100000 == 0) {
                 System.out.printf("\r%d (%d)", y, insideBlocks);
             }
         }
         long timenow = System.currentTimeMillis();
         System.out.printf("%d ms elapsed%n", timenow - dateTime);
+        return insideBlocks;
+    }
+
+    private static List<Vector.PointPlus> getIntersects(Vector entireX, int y) {
+        return _vectorList.stream()
+                .filter(v -> v.isYOnVector(y))
+                .map(entireX::intersect)
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(n -> n.point.x))
+                .toList();
+    }
+
+    private static long determineInsideBocks(List<Vector.PointPlus> intersects) {
+        int lastx = _minx;
+        boolean isInside = false;
+        long intersect = 0;
+        long insideBlocks = 0;
+
+        for (Vector.PointPlus pp : intersects) {
+            if (isInside) {
+                intersect = pp.point.x - lastx + 1; //dikte vector
+                insideBlocks += intersect;
+                lastx = pp.point.x + 1;
+            } else {
+                intersect = pp.point.x - lastx - 1;
+                lastx = pp.point.x;
+            }
+//                System.out.printf(" (%d,%d)%s d=%d (%b), ", pp.point.x, pp.point.y, pp.vector.getDirection(), intersect, isInside);
+            isInside = pp.vector.getInside() == Vector.Dir.e; // set for next iteration
+            // when distance is an east-west vector, it is always inside
+            if (pp.vector.getPoint1().equals(pp.point) && findVectorWest(pp.point)) {
+//                    System.out.printf(" vw ");
+                isInside = true;
+            }
+            if (pp.vector.getPoint2().equals(pp.point) && findVectorEast(pp.point)) {
+//                System.out.printf(" ve ");
+                isInside = true;
+            }
+        }
         return insideBlocks;
     }
 
