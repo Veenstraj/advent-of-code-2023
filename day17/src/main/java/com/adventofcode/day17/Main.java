@@ -7,16 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
 
@@ -27,10 +18,10 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Main main = new Main();
-        main.readFile("com/adventofcode/day17/inputfile_full.txt");
+        main.readFile("./inputTst.txt");
         main.printMaze();
         System.out.printf("Part-1, Shortest path, minimal costs: %s", main.mazeWalker(false));
-        System.out.printf("Part-2, Shortest path, minimal costs: %s", main.mazeWalker(true));
+        //System.out.printf("Part-2, Shortest path, minimal costs: %s", main.mazeWalker(true));
     }
 
     private int mazeWalker(boolean useUltra) {

@@ -2,26 +2,22 @@ package com.adventofcode.day17.othersolutions;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class Main2 {
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
-        BufferedReader br = new BufferedReader(new FileReader("/Users/richardboersma/IdeaProjects/zelfstudie2/src/main/resources/com/adventofcode/day17/inputfile_full.txt"));
+        BufferedReader br = new BufferedReader(new FileReader("./day17/target/classes/input.txt"));
 
         String s;
         List<String> lines = new ArrayList<>();
         while ((s = br.readLine()) != null) {
             lines.add(s);
         }
-        int[][] cave = new int[lines.size()][lines.getFirst().length()];
+        int[][] cave = new int[lines.size()][lines.get(0).length()];
         for (int r = 0; r < lines.size(); r++) {
             String line = lines.get(r);
-            for (int c = 0; c < lines.getFirst().length(); c++) {
+            for (int c = 0; c < lines.get(0).length(); c++) {
                 cave[r][c] = Integer.parseInt(line.substring(c, c + 1));
             }
         }

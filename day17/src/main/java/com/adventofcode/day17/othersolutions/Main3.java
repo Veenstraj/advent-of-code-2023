@@ -1,21 +1,11 @@
 package com.adventofcode.day17.othersolutions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 
 public class Main3 {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main3.class);
 
     public static void main(String[] args) {
         System.out.println(puzzel1());
@@ -80,7 +70,7 @@ public class Main3 {
                 continue;
             }
             visited.add(current.getNode());
-            LOGGER.debug("current {}", current);
+            System.out.println("current " + current);
             if (current.getNode().x() == endX && current.getNode().y() == endY
                     && (part1 || current.getNode().blocks() >= 4)) {
                 return current.getHeatLoss();

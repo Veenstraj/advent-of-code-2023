@@ -3,14 +3,10 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Day17_Dijkstra {
-    private static final String inputfile = "./day17/target/classes/input.txt";
+    private static final String inputfile = "./day17/target/classes/inputTst.txt";
     private static final char[][] _map = new char[145][145];
     private static int _sizex;
     private static int _sizey;
@@ -90,10 +86,10 @@ public class Day17_Dijkstra {
         while (!unsettledNodes.isEmpty()) {
             Node currentNode = getLowestDistanceNode(unsettledNodes);
             if (currentNode == null) {
-                System.out.println("size=" + unsettledNodes.size());
+                //System.out.println("size=" + unsettledNodes.size());
                 unsettledNodes = new HashSet<>();
             } else {
-                System.out.printf("Current node=%d%n", currentNode.getId());
+                //System.out.printf("Current node=%d%n", currentNode.getId());
                 unsettledNodes.remove(currentNode);
                 for (Map.Entry<Node, Integer> adjacencyPair : currentNode.getAdjacentNodes().entrySet()) {
                     Node adjacentNode = adjacencyPair.getKey();
@@ -126,23 +122,23 @@ public class Day17_Dijkstra {
 
     private static boolean calculateMinimumDistance(Node evaluationNode, Integer edgeWeight, Node sourceNode) {
         boolean result = false;
-        System.out.printf(" call (%d, %d, %d)", evaluationNode.getId(), edgeWeight, sourceNode.getId());
+        //System.out.printf(" call (%d, %d, %d)", evaluationNode.getId(), edgeWeight, sourceNode.getId());
         Integer sourceDistance = sourceNode.getDistance();
         if (sourceDistance + edgeWeight < evaluationNode.getDistance()) {
             LinkedList<Node> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
-            System.out.printf(" srcSp=" + getShortestPath(sourceNode.getShortestPath()) + ", sp=" + getShortestPath(shortestPath));
+            //System.out.printf(" srcSp=" + getShortestPath(sourceNode.getShortestPath()) + ", sp=" + getShortestPath(shortestPath));
             if (checkOnDirectionOk(shortestPath, sourceNode)) {
                 evaluationNode.setDistance(sourceDistance + edgeWeight);
-                System.out.printf(" %d->%d: newDist of %d=%d ", sourceNode.getId(), evaluationNode.getId(), evaluationNode.getId(), sourceDistance + edgeWeight);
+                //System.out.printf(" %d->%d: newDist of %d=%d ", sourceNode.getId(), evaluationNode.getId(), evaluationNode.getId(), sourceDistance + edgeWeight);
                 shortestPath.add(sourceNode);
                 evaluationNode.setShortestPath(shortestPath);
                 result = true;
-                System.out.printf(", Path of %d = " + getShortestPath(evaluationNode.getShortestPath()) + "%n", evaluationNode.getId());
+                //System.out.printf(", Path of %d = " + getShortestPath(evaluationNode.getShortestPath()) + "%n", evaluationNode.getId());
             } else {
-                System.out.printf("%d->%d: CheckOnDirectionOk=false%n", sourceNode.getId(), evaluationNode.getId());
+                //System.out.printf("%d->%d: CheckOnDirectionOk=false%n", sourceNode.getId(), evaluationNode.getId());
             }
         } else {
-            System.out.println(" path too long");
+            //System.out.println(" path too long");
         }
         return result;
     }
