@@ -1,186 +1,89 @@
 package org.example;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Rating {
-    int x;
-    int m;
-    int a;
-    int s;
-    int lowerx;
-    int lowerm;
-    int lowera;
-    int lowers;
+    Map<String, Integer> xmasUpper = new HashMap<>();
+    Map<String, Integer> xmasLower = new HashMap<>();
 
     Rating(int x, int m, int a, int s) {
-        this.x = x;
-        this.m = m;
-        this.a = a;
-        this.s = s;
+        this.xmasUpper.put("x", x);
+        this.xmasUpper.put("m", m);
+        this.xmasUpper.put("a", a);
+        this.xmasUpper.put("s", s);
 
-        this.lowerx = 1;
-        this.lowerm = 1;
-        this.lowera = 1;
-        this.lowers = 1;
+        this.xmasLower.put("x", 1);
+        this.xmasLower.put("m", 1);
+        this.xmasLower.put("a", 1);
+        this.xmasLower.put("s", 1);
     }
 
     public Rating clone() {
-        Rating rating = new Rating(x, m, a, s);
-        rating.lowerx = this.lowerx;
-        rating.lowerm = this.lowerm;
-        rating.lowera = this.lowera;
-        rating.lowers = this.lowers;
+        Rating rating = new Rating(this.xmasUpper.get("x"),
+                this.xmasUpper.get("m"),
+                this.xmasUpper.get("a"),
+                this.xmasUpper.get("s"));
+        rating.xmasLower.put("x", this.xmasLower.get("x"));
+        rating.xmasLower.put("m", this.xmasLower.get("m"));
+        rating.xmasLower.put("a", this.xmasLower.get("a"));
+        rating.xmasLower.put("s", this.xmasLower.get("s"));
         return rating;
     }
 
     @Override
     public String toString() {
-        return "Rating x[" + lowerx + ".." + x + "]" +
-                "m[" + lowerm + ".." + m + "]" +
-                "a[" + lowera + ".." + a + "]" +
-                "s[" + lowers + ".." + s + "]";
+        return "Rating x[" + xmasLower.get("x") + ".." + xmasUpper.get("x") + "]" +
+                "m[" + xmasLower.get("m") + ".." + xmasUpper.get("m") + "]" +
+                "a[" + xmasLower.get("a") + ".." + xmasUpper.get("a") + "]" +
+                "s[" + xmasLower.get("s") + ".." + xmasUpper.get("s") + "]";
     }
 
     public int x() {
-        return x;
+        return this.xmasUpper.get("x");
     }
 
     public int m() {
-        return m;
+        return this.xmasUpper.get("m");
     }
 
     public int a() {
-        return a;
+        return this.xmasUpper.get("a");
     }
 
     public int s() {
-        return s;
+        return this.xmasUpper.get("s");
     }
 
-    public int getLowerx() {
-        return lowerx;
+    public int lx() {
+        return this.xmasLower.get("x");
     }
 
-    public void setLowerx(int lowerx) {
-        this.lowerx = lowerx;
+    public int lm() {
+        return this.xmasLower.get("m");
     }
 
-    public int getLowerm() {
-        return lowerm;
+    public int la() {
+        return this.xmasLower.get("a");
     }
 
-    public void setLowerm(int lowerm) {
-        this.lowerm = lowerm;
-    }
-
-    public int getLowera() {
-        return lowera;
-    }
-
-    public void setLowera(int lowera) {
-        this.lowera = lowera;
-    }
-
-    public int getLowers() {
-        return lowers;
-    }
-
-    public void setLowers(int lowers) {
-        this.lowers = lowers;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setM(int m) {
-        this.m = m;
-    }
-
-    public void setA(int a) {
-        this.a = a;
-    }
-
-    public void setS(int s) {
-        this.s = s;
+    public int ls() {
+        return this.xmasLower.get("s");
     }
 
     public int sum() {
-        return x + m + a + s;
+        return x() + m() + a() + s();
     }
 
     public long product() {
-        return (long) (x - lowerx + 1) * (m - lowerm + 1) * (a - lowera + 1) * (s - lowers + 1);
+        return (long) (x() - lx() + 1) * (m() - lm() + 1) * (a() - la() + 1) * (s() - ls() + 1);
     }
 
-    public void setAllZero() {
-        x = m = s = a = 0;
-        lowerx = lowerm = lowera = lowers = 1;
+    public void narrowDown(String rating, int lower, int upper) {
+        if (upper < lower) System.out.printf("Upper %d is lower than lower %d @ %s%n", upper, lower, rating);
+
+        if (lower >= xmasLower.get(rating) && lower <= xmasUpper.get(rating)) xmasLower.put(rating, lower);
+        if (upper >= xmasLower.get(rating) && upper <= xmasUpper.get(rating)) xmasUpper.put(rating, upper);
     }
 
-    public boolean narrowDown(String rating, int lower, int upper) {
-        if (upper < lower) {
-            System.out.printf("Upper %d is lower than lower %d @ %s%n", upper, lower, rating);
-        }
-        boolean modified = false;
-        switch (rating) {
-            case "x" -> {
-                if (lower >= lowerx && lower <= x) {
-                    lowerx = lower;
-                    modified = true;
-                }
-                if (upper >= lowerx && upper <= x) {
-                    x = upper;
-                    modified = true;
-                }
-            }
-            case "m" -> {
-                if (lower >= lowerm && lower <= m) {
-                    lowerm = lower;
-                    modified = true;
-                }
-                if (upper >= lowerm && upper <= m) {
-                    m = upper;
-                    modified = true;
-                }
-            }
-            case "a" -> {
-                if (lower >= lowera && lower <= a) {
-                    lowera = lower;
-                    modified = true;
-                }
-                if (upper >= lowera && upper <= a) {
-                    a = upper;
-                    modified = true;
-                }
-
-            }
-            case "s" -> {
-                if (lower >= lowers && lower <= s) {
-                    lowers = lower;
-                    modified = true;
-                }
-                if (upper >= lowers && upper <= s) {
-                    s = upper;
-                    modified = true;
-                }
-            }
-        }
-        return modified;
-    }
-
-//    public boolean inRange(String rating, int value) {
-//        switch (rating) {
-//            case "x" -> {
-//                return (value >= lowerx && value <= x);
-//            }
-//            case "m" -> {
-//                return (value >= lowerm && value <= m);
-//            }
-//            case "a" -> {
-//                return (value >= lowera && value <= a);
-//            }
-//            case "s" -> {
-//                return (value >= lowers && value <= s);
-//            }
-//        }
-//    }
 }

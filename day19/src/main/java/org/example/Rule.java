@@ -1,6 +1,6 @@
 package org.example;
 
-public record Rule(int order, String rating, boolean greaterThan, int value, String destination) {
+public record Rule(String rating, boolean greaterThan, int value, String destination) {
 
     public String apply(Rating rating) {
         int ratingvalue = 0;
