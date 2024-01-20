@@ -155,7 +155,7 @@ public class Day17 {
         System.out.println(caption);
         for (int y = 0; y < _sizey; y++) {
             for (int x = 0; x < _sizex; x++) {
-                System.out.print(String.valueOf(getVst(x, y)));
+                System.out.print(getVst(x, y));
             }
             System.out.println();
         }

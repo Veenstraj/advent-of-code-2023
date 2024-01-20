@@ -131,7 +131,7 @@ public class Vector {
         w(2), e(0), n(3), s(1);
         public final int number;
 
-        private Dir(int number) {
+        Dir(int number) {
             this.number = number;
         }
     }

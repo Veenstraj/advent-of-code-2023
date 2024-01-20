@@ -146,7 +146,7 @@ public class Day17_Dijkstra {
     private static String getShortestPath(List<Node> sp) {
         int size = Math.min(sp.stream().map(Node::getId).toList().size(), 5);
         if (size == 5) {
-            return sp.stream().map(Node::getId).toList().subList(0, size).toString() + "..";
+            return sp.stream().map(Node::getId).toList().subList(0, size) + "..";
         } else {
             return sp.stream().map(Node::getId).toList().subList(0, size).toString();
 

@@ -1,0 +1,9 @@
+px{a<2:qkq,m>2:A,R}
+qkq{x>3:A,R}
+in{s<3:px,qqz}
+qqz{s>1:R,A}
+
+{x=4,m=3,a=2,s=1}
+{x=3,m=2,a=1,s=4}
+{x=2,m=1,a=4,s=3}
+{x=1,m=4,a=3,s=2}

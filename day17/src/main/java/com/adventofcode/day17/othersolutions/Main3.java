@@ -90,8 +90,8 @@ public class Main3 {
         public static final int SOUTH = 2;
         public static final int WEST = 3;
 
-        private Node node;
-        private int heatLoss;
+        private final Node node;
+        private final int heatLoss;
 
         public Element(Node node, int heatLoss) {
             this.node = node;

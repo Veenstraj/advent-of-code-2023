@@ -203,7 +203,7 @@ public class Day16 {
     }
 
     private static void print(int x, int y) {
-        System.out.print(String.valueOf(getMap(x, y)) + " ");
+        System.out.print(getMap(x, y) + " ");
     }
 
     private static void printCoord(int x, int y) {
@@ -224,7 +224,7 @@ public class Day16 {
         System.out.println(caption);
         for (int y = 0; y < _sizey; y++) {
             for (int x = 0; x < _sizex; x++) {
-                System.out.print(String.valueOf(getVst(x, y)));
+                System.out.print(getVst(x, y));
             }
             System.out.println();
         }
@@ -235,7 +235,7 @@ public class Day16 {
         System.out.println(caption);
         for (int y = 0; y < _sizey; y++) {
             for (int x = 0; x < _sizex; x++) {
-                System.out.print(String.valueOf(getMap(x, y)));
+                System.out.print(getMap(x, y));
             }
             System.out.println();
         }

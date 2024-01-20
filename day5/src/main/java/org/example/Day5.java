@@ -3,24 +3,20 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.parseLong;
 
 public class Day5 {
     private static List<Long> _seeds = new ArrayList<>();
-    private static HashMap<Source, Long> _seedToSoil = new HashMap<>();
-    private static HashMap<Source, Long> _soilToFertilizer = new HashMap<>();
-    private static HashMap<Source, Long> _fertilizerToWater = new HashMap<>();
-    private static HashMap<Source, Long> _waterToLight = new HashMap<>();
-    private static HashMap<Source, Long> _lightToTemperature = new HashMap<>();
-    private static HashMap<Source, Long> _temperatureToHumidity = new HashMap<>();
-    private static HashMap<Source, Long> _humidityToLocation = new HashMap<>();
+    private static final HashMap<Source, Long> _seedToSoil = new HashMap<>();
+    private static final HashMap<Source, Long> _soilToFertilizer = new HashMap<>();
+    private static final HashMap<Source, Long> _fertilizerToWater = new HashMap<>();
+    private static final HashMap<Source, Long> _waterToLight = new HashMap<>();
+    private static final HashMap<Source, Long> _lightToTemperature = new HashMap<>();
+    private static final HashMap<Source, Long> _temperatureToHumidity = new HashMap<>();
+    private static final HashMap<Source, Long> _humidityToLocation = new HashMap<>();
 
     public static void main(String[] args) {
 

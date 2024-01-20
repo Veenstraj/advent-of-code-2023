@@ -5,8 +5,8 @@ import java.util.List;
 
 public class State {
 
-    private Node node;
-    private int heatLoss;
+    private final Node node;
+    private final int heatLoss;
 
     private List<Node> shortestPath = new LinkedList<>();
 

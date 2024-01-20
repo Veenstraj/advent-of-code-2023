@@ -144,10 +144,9 @@ public class Day1 {
     private static String bepaalPositieBackward(String line, String tekst, String digit) {
         if (line.lastIndexOf(tekst) >= 0 && line.lastIndexOf(tekst) > index) {
             index = line.lastIndexOf(tekst);
-            StringBuilder builder = new StringBuilder();
-            builder.append(digit);
-            builder.append(line.substring(index + tekst.length()));
-            return builder.toString();
+            String builder = digit +
+                    line.substring(index + tekst.length());
+            return builder;
         }
         return null;
     }

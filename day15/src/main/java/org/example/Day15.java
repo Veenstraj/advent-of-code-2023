@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Day15 {
     private static final String inputfile = "./day15/target/classes/input.txt";
 
-    private static String[][] _box = new String[256][1000];
+    private static final String[][] _box = new String[256][1000];
 
     public static void main(String[] args) {
 
@@ -63,7 +63,7 @@ public class Day15 {
     }
 
     private static int hash(int hash, char input) {
-        hash += (int) input;
+        hash += input;
         return (hash * 17) % 256;
     }
 

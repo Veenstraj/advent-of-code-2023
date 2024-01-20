@@ -7,7 +7,7 @@ import java.util.Map;
 
 // The Class to handle nodes
 class Node {
-    private int id;
+    private final int id;
 
     private final int x;
 

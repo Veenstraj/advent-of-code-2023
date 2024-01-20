@@ -222,7 +222,7 @@ public class Day14 {
     }
 
     private static void print(int x, int y) {
-        System.out.print(String.valueOf(get(x, y)) + " ");
+        System.out.print(get(x, y) + " ");
     }
 
     private static void printPlatform(String direction) {
